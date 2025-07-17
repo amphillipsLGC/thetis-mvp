@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# 
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Web", "Thetis.Web\Thetis.Web.csproj", "{40DCA9D3-5CD1-4913-817C-15776758DACC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Users", "Thetis.Users\Thetis.Users.csproj", "{98115D1E-1C17-4767-837F-0B10776C31A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40DCA9D3-5CD1-4913-817C-15776758DACC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40DCA9D3-5CD1-4913-817C-15776758DACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40DCA9D3-5CD1-4913-817C-15776758DACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40DCA9D3-5CD1-4913-817C-15776758DACC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98115D1E-1C17-4767-837F-0B10776C31A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98115D1E-1C17-4767-837F-0B10776C31A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98115D1E-1C17-4767-837F-0B10776C31A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98115D1E-1C17-4767-837F-0B10776C31A7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

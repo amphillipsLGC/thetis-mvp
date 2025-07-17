@@ -1,0 +1,6 @@
+@Thetis_HostAddress = http://localhost:5032
+
+GET {{Thetis_HostAddress}}/users
+Accept: application/json
+
+###
