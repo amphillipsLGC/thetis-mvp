@@ -1,8 +1,10 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Thetis.Users.Application.Models;
+using Thetis.Users.Application.Services;
 
-namespace Thetis.Users;
+namespace Thetis.Users.Endpoints;
 
 public class ListUsersResponse
 {

@@ -1,4 +1,6 @@
-﻿namespace Thetis.Users;
+﻿using Thetis.Users.Application.Models;
+
+namespace Thetis.Users.Application.Services;
 
 internal interface IUserService
 {

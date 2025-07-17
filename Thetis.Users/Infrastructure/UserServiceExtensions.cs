@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Thetis.Users.Application.Services;
 
-namespace Thetis.Users;
+namespace Thetis.Users.Infrastructure;
 
 public static class UserServiceExtensions
 {

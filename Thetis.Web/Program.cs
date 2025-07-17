@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Thetis.Users;
+using Thetis.Users.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
