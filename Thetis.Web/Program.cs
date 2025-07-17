@@ -1,3 +1,4 @@
+using FastEndpoints;
 using Thetis.Users;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddUserServices();
 
 builder.Services.AddOpenApi();
+builder.Services.AddFastEndpoints();
 
 var app = builder.Build();
 
@@ -16,7 +18,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Map module endpoints
-app.MapUserEndpoints();
+app.UseFastEndpoints();
 
 app.Run();
