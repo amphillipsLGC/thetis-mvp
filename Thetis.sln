@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Web", "Thetis.Web\Th
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Users", "Thetis.Users\Thetis.Users.csproj", "{98115D1E-1C17-4767-837F-0B10776C31A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.AspireAppHost", "Thetis.AspireAppHost\Thetis.AspireAppHost.csproj", "{AA788B09-1CEF-4860-881B-77BBFB0DDBD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,5 +21,9 @@ Global
 		{98115D1E-1C17-4767-837F-0B10776C31A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98115D1E-1C17-4767-837F-0B10776C31A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98115D1E-1C17-4767-837F-0B10776C31A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA788B09-1CEF-4860-881B-77BBFB0DDBD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA788B09-1CEF-4860-881B-77BBFB0DDBD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA788B09-1CEF-4860-881B-77BBFB0DDBD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA788B09-1CEF-4860-881B-77BBFB0DDBD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
