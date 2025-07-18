@@ -11,6 +11,8 @@ internal class User
     public DateTimeOffset CreatedOn { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? UpdatedOn { get; set; } = null;
     public DateTimeOffset? LastLogin { get; set; } = null;
+
+    public virtual ICollection<Role> Roles { get; set; } = [];
 }
 
 internal class Role
@@ -19,6 +21,8 @@ internal class Role
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<Claim> Claims { get; set; } = [];
+    
+    public virtual ICollection<User> Users { get; set; } = [];
 }
 
 internal class UserRole

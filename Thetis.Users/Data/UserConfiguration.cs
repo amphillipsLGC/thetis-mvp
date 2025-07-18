@@ -28,8 +28,12 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .IsUnique();
         
         builder.HasData(GetDefaultUsers());
-        
+
+        builder.HasMany(e => e.Roles)
+            .WithMany(e => e.Users);
+
     }
+    
     private IEnumerable<User> GetDefaultUsers()
     {
         // Password is Admin123!
@@ -44,13 +48,3 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         };
     }
 }
-
-
-
-public static class DataSchemaConstants
-{
-    public const string Schema = "Users";
-    public const int DefaultNameLength = 100;
-    public const int DefaultEmailLength = 256;
-}
-
