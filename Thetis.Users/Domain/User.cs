@@ -55,5 +55,4 @@ internal class RoleClaim
         ClaimType = claim.Type;
         ClaimValue = claim.Value;
     }
-
 }
