@@ -21,5 +21,14 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
 
         builder.HasIndex(r => r.Name)
             .IsUnique();
+
+        builder.HasMany(r => r.Users)
+            .WithOne(u => u.Role)
+            .HasForeignKey(k => k.RoleId);
+            
+        
+        builder.HasMany(r => r.Claims)
+            .WithOne(c => c.Role)
+            .HasForeignKey(k => k.RoleId);
     }
 }

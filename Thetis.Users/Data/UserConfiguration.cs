@@ -29,8 +29,9 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         
         builder.HasData(GetDefaultUsers());
 
-        builder.HasMany(e => e.Roles)
-            .WithMany(e => e.Users);
+        builder.HasMany(u => u.Roles)
+            .WithOne(r =>   r.User)
+            .HasForeignKey(k => k.UserId);
 
     }
     
