@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Web", "Thetis.Web\Thetis.Web.csproj", "{40DCA9D3-5CD1-4913-817C-15776758DACC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Users", "Thetis.Users\Thetis.Users.csproj", "{98115D1E-1C17-4767-837F-0B10776C31A7}"

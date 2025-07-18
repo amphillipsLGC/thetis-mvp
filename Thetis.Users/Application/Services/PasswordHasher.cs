@@ -4,7 +4,7 @@ using Thetis.Users.Domain;
 
 namespace Thetis.Users.Application.Services;
 
-public sealed class PasswordHasher : IPasswordHasher<User>
+internal class PasswordHasher : IPasswordHasher<User>
 {
     private const int SaltSize = 16;
     private const int HashSize = 32;
@@ -18,7 +18,7 @@ public sealed class PasswordHasher : IPasswordHasher<User>
             rng.GetBytes(salt);
         }
 
-        var hash = Rfc2898DeriveBytes.Pbkdf2(System.Text.Encoding.UTF8.GetBytes(password), salt, Iterations, HashAlgorithmName.SHA3_512, HashSize);
+        var hash = Rfc2898DeriveBytes.Pbkdf2(System.Text.Encoding.UTF8.GetBytes(password), salt, Iterations, HashAlgorithmName.SHA512, HashSize);
         return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 
@@ -33,7 +33,7 @@ public sealed class PasswordHasher : IPasswordHasher<User>
         var salt = Convert.FromBase64String(parts[0]);
         var hash = Convert.FromBase64String(parts[1]);
 
-        var providedHash = Rfc2898DeriveBytes.Pbkdf2(System.Text.Encoding.UTF8.GetBytes(providedPassword), salt, Iterations, HashAlgorithmName.SHA3_512, HashSize);
+        var providedHash = Rfc2898DeriveBytes.Pbkdf2(System.Text.Encoding.UTF8.GetBytes(providedPassword), salt, Iterations, HashAlgorithmName.SHA512, HashSize);
 
         return hash.SequenceEqual(providedHash) ? PasswordVerificationResult.Success : PasswordVerificationResult.Failed;
     }
