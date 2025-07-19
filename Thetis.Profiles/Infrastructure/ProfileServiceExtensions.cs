@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Thetis.Profiles.Application.Services;
 using Thetis.Profiles.Data;
 
 namespace Thetis.Profiles.Infrastructure;
@@ -26,6 +27,6 @@ public static class ProfileServiceExtensions
         
         
         services.AddScoped<IProfileRepository, ProfileRepository>();
-        // services.AddScoped<IProfileService, ProfileService>();
+        services.AddScoped<IProfileService, ProfileService>();
     }
 }
