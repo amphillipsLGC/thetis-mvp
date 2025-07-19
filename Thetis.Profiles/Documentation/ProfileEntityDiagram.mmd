@@ -1,0 +1,41 @@
+classDiagram
+    class Profile
+    Profile: +Guid Id
+    Profile: +Guid UserId
+    Profile: +string Name
+    Profile: +string? Description
+    Profile: +bool IsPublic
+    Profile: +ProfileOwner Owner
+    Profile: +List~DataRequirement~ DataRequirements
+
+    Profile "1" --> ProfileOwner
+    Profile "1" --> "many" DataRequirement
+
+    class ProfileOwner
+    ProfileOwner: +Guid UserId
+    ProfileOwner: +string FirstName
+    ProfileOwner: +string LastName
+
+    class DataRequirement
+    DataRequirement: +Guid Id
+    DataRequirement: +string ResourceType
+    DataRequirement: List~DataRequirementRule~ Rules
+
+    DataRequirement "1" --> "many" DataRequirementRule
+
+    class DataRequirementRule
+    DataRequirementRule: +string PropertyName
+    DataRequirementRule: +RuleOperator Operator
+    DataRequirementRule: +string OperatorValue
+
+    DataRequirementRule "1" --> RuleOperator
+
+    class RuleOperator
+    <<enumeration>> RuleOperator
+    RuleOperator: Equals
+    RuleOperator: NotEquals
+    RuleOperator: Contains
+    RuleOperator: GreaterThan
+    RuleOperator: GreaterThanOrEqual
+    RuleOperator: LessThan
+    RuleOperator: LessThanOrEqual
