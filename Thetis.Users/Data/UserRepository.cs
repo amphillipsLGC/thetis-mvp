@@ -10,8 +10,8 @@ internal interface IUserRepository
 
     Task<List<User>> ListAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken);
     Task AddAsync(User user, CancellationToken cancellationToken);
-    Task UpdateAsync(User user, CancellationToken cancellationToken);
-    Task DeleteAsync(User user, CancellationToken cancellationToken);
+    Task Update(User user);
+    Task Delete(User user);
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }
 
@@ -27,17 +27,17 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
-    public Task<User?> GetByEmailAsync(string email, bool noTracking = false, CancellationToken cancellationToken = default)
+    public async Task<User?> GetByEmailAsync(string email, bool noTracking = false, CancellationToken cancellationToken = default)
     {
         var query = noTracking
             ? dbContext.Users.AsNoTracking()
             : dbContext.Users;
 
-        return query
+        return await query
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
-    public Task<List<User>> ListAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    public async Task<List<User>> ListAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
         var query = dbContext.Users.AsQueryable();
 
@@ -54,24 +54,25 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
         }
 
         // Apply pagination
-        return query.Skip((pageNumber - 1) * pageSize)
+        var list = await query.Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync(cancellationToken);
+
+        return list;
     }
 
-    public Task AddAsync(User user, CancellationToken cancellationToken = default)
+    public async Task AddAsync(User user, CancellationToken cancellationToken = default)
     {
-        dbContext.Users.Add(user);
-        return Task.CompletedTask;
+        await dbContext.Users.AddAsync(user, cancellationToken);
     }
 
-    public Task UpdateAsync(User user, CancellationToken cancellationToken = default)
+    public Task Update(User user)
     {
         dbContext.Users.Update(user);
         return Task.CompletedTask;
     }
 
-    public Task DeleteAsync(User user, CancellationToken cancellationToken = default)
+    public Task Delete(User user)
     {
         dbContext.Users.Remove(user);
         return Task.CompletedTask;

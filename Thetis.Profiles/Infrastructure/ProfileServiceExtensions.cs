@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Thetis.Profiles.Data;
 
 namespace Thetis.Profiles.Infrastructure;
 
@@ -13,16 +15,17 @@ public static class ProfileServiceExtensions
             throw new InvalidOperationException("Connection string 'ProfilesDbConnectionString' is not configured.");
         }
 
-        // services.AddDbContext<ProfileDbContext>(options =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.EnableRetryOnFailure();
-        //         npgsqlOptions.CommandTimeout(30);
-        //     });
-        // });
-        //
-        // services.AddScoped<IProfileRepository, ProfileRepository>();
+        services.AddDbContext<ProfileDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure();
+                npgsqlOptions.CommandTimeout(30);
+            });
+        });
+        
+        
+        services.AddScoped<IProfileRepository, ProfileRepository>();
         // services.AddScoped<IProfileService, ProfileService>();
     }
 }

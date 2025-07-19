@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Thetis.Profiles\Thetis.Profiles.csproj" />
       <ProjectReference Include="..\Thetis.Users\Thetis.Users.csproj" />
     </ItemGroup>
 
