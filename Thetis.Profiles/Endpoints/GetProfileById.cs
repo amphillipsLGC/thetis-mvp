@@ -7,10 +7,6 @@ using Thetis.Profiles.Application.Services;
 
 namespace Thetis.Profiles.Endpoints;
 
-internal class GetProfileByIdResponse
-{
-    public ProfileModel Profile { get; set; } = null!;
-}
 
 internal class GetProfileById(IProfileService profileService) : EndpointWithoutRequest
 {
@@ -45,6 +41,7 @@ internal class GetProfileById(IProfileService profileService) : EndpointWithoutR
             return;
         }
         
+        // Check if the ID is empty
         if (id == Guid.Empty)
         {
             var problem = new ProblemDetails
@@ -64,11 +61,7 @@ internal class GetProfileById(IProfileService profileService) : EndpointWithoutR
 
         if (result is not null)
         {
-            var response = new GetProfileByIdResponse
-            {
-                Profile = result.ToModel()
-            };
-            await SendOkAsync(result, cancellation: cancellationToken);
+            await SendOkAsync(result.ToModel(), cancellation: cancellationToken);
         }
         else
         {
