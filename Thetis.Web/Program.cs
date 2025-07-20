@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Thetis.Profiles.Infrastructure;
 using Thetis.Users.Infrastructure;
+using Thetis.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

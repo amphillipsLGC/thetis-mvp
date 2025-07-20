@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using Thetis.Common.Enums;
 using Thetis.Profiles.Domain;
 
 namespace Thetis.Profiles.Application.Models;
@@ -29,6 +31,7 @@ internal record DataRequirementModel
 internal record DataRequirementRuleModel
 {
     public string PropertyName { get; set; } = string.Empty;
+    [JsonConverter(typeof(RuleOperatorJsonConverter))]
     public RuleOperator Operator { get; set; }
     public string? OperatorValue { get; set; }
 }

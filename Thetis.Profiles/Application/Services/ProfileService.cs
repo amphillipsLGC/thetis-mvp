@@ -1,5 +1,6 @@
 using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
+using Thetis.Common.Exceptions;
 using Thetis.Profiles.Data;
 using Thetis.Profiles.Domain;
 
@@ -76,7 +77,23 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
 
         try
         {
-            await repository.Update(profile);
+            var existingProfile = await repository.GetByIdAsync(profile.Id, noTracking: false, cancellationToken);
+            
+            if (existingProfile is null)
+            {
+                logger.LogWarning("Profile with ID {ProfileId} not found for update.", profile.Id);
+                var ex = new EntityNotFoundException("Profile", profile.Id);
+                return new Result<Profile>(ex);
+            }
+            
+            // Update the existing profile with the new values
+            existingProfile.Name = profile.Name;
+            existingProfile.Description = profile.Description;
+            existingProfile.IsPublic = profile.IsPublic;
+            existingProfile.DataRequirements = profile.DataRequirements;
+            existingProfile.ModifiedOn = DateTimeOffset.UtcNow;
+            
+            await repository.Update(existingProfile);
             
             await repository.SaveChangesAsync(cancellationToken);
             logger.LogInformation("Profile {ProfileId} updated successfully.", profile.Id);
@@ -88,7 +105,6 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
             logger.LogError(ex, "Error updating profile {ProfileId}", profile.Id);
             return new Result<Profile>(ex);
         }
-        
     }
 
     public async Task<Result<bool>> DeleteProfileAsync(Guid profileId, CancellationToken cancellationToken = default)

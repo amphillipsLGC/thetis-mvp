@@ -1,3 +1,5 @@
+using Thetis.Common.Enums;
+
 namespace Thetis.Profiles.Domain;
 
 internal class Profile
@@ -8,6 +10,7 @@ internal class Profile
     public string? Description { get; set; }
     public bool IsPublic { get; set; }
     public DateTimeOffset CreatedOn { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset ModifiedOn { get; set; } = DateTimeOffset.UtcNow;
     
     public virtual required ProfileOwner Owner { get; set; }
     public virtual List<DataRequirement> DataRequirements { get; set; } = [];
