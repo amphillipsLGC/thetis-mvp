@@ -1,4 +1,5 @@
 using FastEndpoints;
+using Microsoft.Extensions.FileProviders;
 using Thetis.Profiles.Infrastructure;
 using Thetis.Users.Infrastructure;
 using Thetis.Web.Middleware;
@@ -23,6 +24,22 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "browser")),
+    RequestPath = ""
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "browser")),
+    RequestPath = ""
+});
+
 app.UseFastEndpoints();
+
+//app.MapFallbackToFile("index.html");
 
 app.Run();

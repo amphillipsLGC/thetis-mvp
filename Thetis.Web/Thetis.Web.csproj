@@ -16,4 +16,18 @@
       <ProjectReference Include="..\Thetis.Users\Thetis.Users.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <AngularBuildConfiguration Condition="'$(Configuration)' == 'Debug'">development</AngularBuildConfiguration>
+        <AngularBuildConfiguration Condition="'$(Configuration)' == 'Release'">production</AngularBuildConfiguration>
+    </PropertyGroup>
+
+    <Target Name="BuildAngular" BeforeTargets="Build">
+        <Exec Command="npm install" WorkingDirectory="../Thetis.UI" />
+        <Exec Command="npm run build -- --configuration $(AngularBuildConfiguration)" WorkingDirectory="../Thetis.UI" />
+    </Target>
+
 </Project>
