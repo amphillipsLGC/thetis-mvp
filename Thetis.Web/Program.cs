@@ -1,5 +1,4 @@
 using FastEndpoints;
-using Thetis.Common.Extensions;
 using Thetis.Profiles.Infrastructure;
 using Thetis.Users.Infrastructure;
 using Thetis.Web.Extensions;

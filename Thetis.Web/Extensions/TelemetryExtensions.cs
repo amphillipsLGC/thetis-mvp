@@ -1,10 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace Thetis.Common.Extensions;
+namespace Thetis.Web.Extensions;
 
 public static class TelemetryExtensions
 {
@@ -42,7 +40,6 @@ public static class TelemetryExtensions
             .WithMetrics(metricsBuilder =>
             {
                 metricsBuilder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName))
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddRuntimeInstrumentation()
