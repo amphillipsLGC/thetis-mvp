@@ -1,11 +1,13 @@
 using FastEndpoints;
-using Microsoft.Extensions.FileProviders;
+using Thetis.Common.Extensions;
 using Thetis.Profiles.Infrastructure;
 using Thetis.Users.Infrastructure;
 using Thetis.Web.Extensions;
 using Thetis.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddTelemetry();
 
 // Add Module Services
 builder.Services.AddUserServices(builder.Configuration);
