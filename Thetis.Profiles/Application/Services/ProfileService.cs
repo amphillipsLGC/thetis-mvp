@@ -120,7 +120,7 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
         if (profile is null)
         {
             logger.LogWarning("Profile with ID {ProfileId} not found.", profileId);
-            var ex = new KeyNotFoundException($"Profile with ID {profileId} not found.");
+            var ex = new EntityNotFoundException("Profile", profileId);
             return new Result<bool>(ex);
         }
 

@@ -1,18 +1,23 @@
 @Thetis_HostAddress = http://localhost:5032
 
-### User Endpoints
+// User Endpoints
+
+### Get all users
 
 GET {{Thetis_HostAddress}}/users
 Accept: application/json
 
+//Profile Endpoints
 
-### Profile Endpoints
+### Get profile by ID
+
 @Profile_Id = 12345
-
 GET {{Thetis_HostAddress}}/profiles/{{Profile_Id}}
 Accept: application/json
 
-### 
+### Get all profiles
 
-GET {{Thetis_HostAddress}}/profiles?pageNumber=1&pageSize=20
+@ProfilePageNumber = 1
+@ProfilePageSize = 10
+GET {{Thetis_HostAddress}}/profiles?pageNumber={{ProfilePageNumber}}&pageSize={{ProfilePageSize}}
 ASccept: application/json
