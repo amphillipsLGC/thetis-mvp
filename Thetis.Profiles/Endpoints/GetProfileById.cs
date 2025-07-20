@@ -12,7 +12,7 @@ internal class GetProfileById(IProfileService profileService) : EndpointWithoutR
 {
     public override void Configure()
     {
-        Get("/profiles/{profileId}");
+        Get("/profiles/{id}");
         Description(x => x
             .WithName("Get Profile by ID")
             .Produces<ProfileModel>(200)
@@ -25,10 +25,10 @@ internal class GetProfileById(IProfileService profileService) : EndpointWithoutR
     public override async Task HandleAsync(CancellationToken cancellationToken)
     {
         // Extract profileId from the route
-        var profileId = Route<string>("profileId");
+        var id = Route<string>("id");
 
         // Validate the profileId format
-        if(!Guid.TryParse(profileId, out var id))
+        if(!Guid.TryParse(id, out var profileId))
         {
             var problem = new ProblemDetails
             {
@@ -42,7 +42,7 @@ internal class GetProfileById(IProfileService profileService) : EndpointWithoutR
         }
         
         // Check if the ID is empty
-        if (id == Guid.Empty)
+        if (profileId == Guid.Empty)
         {
             var problem = new ProblemDetails
             {
@@ -57,7 +57,7 @@ internal class GetProfileById(IProfileService profileService) : EndpointWithoutR
         }
 
         // Fetch the profile by ID
-        var result = await profileService.GetProfileByIdAsync(id, cancellationToken);
+        var result = await profileService.GetProfileByIdAsync(profileId, cancellationToken);
 
         if (result is not null)
         {

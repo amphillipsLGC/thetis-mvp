@@ -30,7 +30,7 @@ internal class CreateProfile(IProfileService profileService) : Endpoint<ProfileM
             error => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
-                Detail = error.Message,
+                Detail = $"An unexpected error occurred while deleting the profile. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
                 TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
             }
         );
