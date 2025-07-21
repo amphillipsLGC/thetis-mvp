@@ -1,18 +1,43 @@
+using Microsoft.Extensions.FileProviders;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
-namespace Thetis.Web.Extensions;
+namespace Thetis.Web;
 
-public static class TelemetryExtensions
+public static class AppConfiguration
 {
     private const string HealthEndpointPath = "/health";
     private const string AlivenessEndpointPath = "/alive";
     private const string AspireTelemetryEndpointPath = "http://localhost:4317";
     
-    public static TBuilder AddTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    public static void AddSerilog(this WebApplicationBuilder builder)
     {
-        var serviceName = builder.Configuration["OpenTelemetry:ServiceName"] ?? "Thetis";
+        var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
+        var aspireEndpoint =
+            Environment.GetEnvironmentVariable("ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL")
+            ?? builder.Configuration["OpenTelemetry:AspireEndpoint"]
+            ?? AspireTelemetryEndpointPath;
+           
+        builder.Host.UseSerilog(
+            (context, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+                    .WriteTo.OpenTelemetry(options =>
+                    {
+                        options.Endpoint = !string.IsNullOrEmpty(otlpEndpoint) ? otlpEndpoint : aspireEndpoint;
+                    })
+                    .Enrich.FromLogContext()
+                    .Enrich.WithMachineName()
+                    .Enrich.WithThreadId();
+            });
+    }
+    
+    public static void AddTelemetry(this WebApplicationBuilder builder)
+    {
         var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
         var aspireEndpoint =
             Environment.GetEnvironmentVariable("ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL")
@@ -23,7 +48,6 @@ public static class TelemetryExtensions
             .WithTracing(tracingBuilder =>
             {
                 tracingBuilder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName))
                     .AddAspNetCoreInstrumentation(tracing =>
                         tracing.Filter = context => 
                             !context.Request.Path.StartsWithSegments(HealthEndpointPath)
@@ -48,7 +72,6 @@ public static class TelemetryExtensions
                         options.Endpoint = new Uri(!string.IsNullOrEmpty(otlpEndpoint) ? otlpEndpoint : aspireEndpoint);
                     });
             });
-
         
             // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
             //if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
@@ -56,7 +79,22 @@ public static class TelemetryExtensions
             //    builder.Services.AddOpenTelemetry()
             //       .UseAzureMonitor();
             //}
-            
-        return builder;
+    }
+    
+    public static void UseBrowserStaticFiles(this IApplicationBuilder app, string contentRootPath)
+    {
+        var browserPath = Path.Combine(contentRootPath, "wwwroot", "browser");
+
+        app.UseDefaultFiles(new DefaultFilesOptions
+        {
+            FileProvider = new PhysicalFileProvider(browserPath),
+            RequestPath = ""
+        });
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(browserPath),
+            RequestPath = ""
+        });
     }
 }
