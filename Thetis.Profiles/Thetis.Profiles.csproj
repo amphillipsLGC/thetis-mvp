@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Documentation\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="FastEndpoints" Version="6.2.0" />
       <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
