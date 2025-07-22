@@ -20,12 +20,13 @@ builder.Services.AddFastEndpoints();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("ExposeOpenApi"))
 {
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
-        options.WithTitle("Thetis API")
+        options
+            .WithTitle("Thetis API")
             .WithTheme(ScalarTheme.Default);
 
     });
