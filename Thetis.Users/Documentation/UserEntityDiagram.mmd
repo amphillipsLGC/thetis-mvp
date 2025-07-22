@@ -1,0 +1,37 @@
+classDiagram
+    class User
+    User: +Guid Id◊
+    User: +string FirstName
+    User: +string LastName
+    User: +string Username
+    User: +string Email
+    User: +bool EmailVerified
+    User: +string PasswordHash
+    User: +DateTimeOffset CreatedOn
+    User: +DateTimeOffset UpdatedOn
+    User: +DateTimeOffset LastLogin
+    User: +bool IsDeleted
+    User: +List~UserRole~ Roles
+
+    class Role
+    Role: +Guid Id
+    Role: +string Name
+    Role: +string Description
+    Role: +List~UserRole~ Users
+    Role: +List~RoleClaim~ Claims
+
+    class UserRole
+    UserRole: +Guid UserId
+    UserRole: +Guid RoleId
+    UserRole: +User User
+    UserRole: +Role Role
+
+    class RoleClaim
+    RoleClaim: +Guid RoleId
+    RoleClaim: +string ClaimType
+    RoleClaim: +string ClaimValue
+    RoleClaim: +Role Role
+
+    User "1" --> "many" UserRole
+    Role "1" --> "many" UserRole
+    Role "1" --> "many" RoleClaim

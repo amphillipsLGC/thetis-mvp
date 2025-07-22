@@ -23,9 +23,18 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Email)
             .IsRequired()
             .HasMaxLength(DataSchemaConstants.DefaultEmailLength);
-
+        
         builder.HasIndex(u => u.Email)
             .IsUnique();
+
+        builder.Property(u => u.Username)
+            .HasMaxLength(DataSchemaConstants.DefaultNameLength);
+        
+        builder.HasIndex(u => u.Username)
+            .IsUnique();
+
+        builder.Property(u => u.PasswordHash)
+            .HasMaxLength(512);
         
         builder.HasData(GetDefaultUsers());
 
@@ -43,7 +52,7 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             Id = Guid.CreateVersion7(),
             FirstName = "Admin",
             LastName = "User",
-            Email = "admin.user@example.com",
+            Username = "admin",
             EmailVerified = true,
             PasswordHash = "gw5du/XgGNMDFbSNI/XBaA==:0tiw1hzqokOFaWVslwT+rM0eFUeLE71nSUmKYkzAE9s="
         };

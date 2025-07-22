@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace Thetis.Users.Domain;
@@ -7,12 +8,15 @@ internal class User
     public Guid Id { get; set; } = Guid.CreateVersion7();
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+    public string? Username { get; set; }
+    [EmailAddress]
+    public string? Email { get; set; }
     public bool EmailVerified { get; set; } = false;
-    public string PasswordHash { get; set; } = string.Empty;
+    public string? PasswordHash { get; set; }
     public DateTimeOffset CreatedOn { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? UpdatedOn { get; set; } = null;
     public DateTimeOffset? LastLogin { get; set; } = null;
+    public bool IsDeleted { get; set; } = false;
 
     public virtual ICollection<UserRole> Roles { get; set; } = [];
 }
@@ -38,7 +42,6 @@ internal class UserRole
 
 internal class RoleClaim
 {
-    public Guid UserId { get; set; }
     public Guid RoleId { get; set; }
     public string ClaimType { get; set; } = string.Empty;
     public string ClaimValue { get; set; } = string.Empty;
