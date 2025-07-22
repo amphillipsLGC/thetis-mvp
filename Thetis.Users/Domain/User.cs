@@ -11,12 +11,12 @@ internal class User
     public string? Username { get; set; }
     [EmailAddress]
     public string? Email { get; set; }
-    public bool EmailVerified { get; set; } = false;
+    public bool EmailVerified { get; set; }
     public string? PasswordHash { get; set; }
     public DateTimeOffset CreatedOn { get; set; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset? UpdatedOn { get; set; } = null;
-    public DateTimeOffset? LastLogin { get; set; } = null;
-    public bool IsDeleted { get; set; } = false;
+    public DateTimeOffset? UpdatedOn { get; set; }
+    public DateTimeOffset? LastLogin { get; set; }
+    public bool IsDeleted { get; set; }
 
     public virtual ICollection<UserRole> Roles { get; set; } = [];
 }
