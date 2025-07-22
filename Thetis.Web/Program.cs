@@ -1,4 +1,5 @@
 using FastEndpoints;
+using Scalar.AspNetCore;
 using Thetis.Profiles.Infrastructure;
 using Thetis.Users.Infrastructure;
 using Thetis.Web;
@@ -22,6 +23,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("Thetis API")
+            .WithTheme(ScalarTheme.Default);
+
+    });
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
