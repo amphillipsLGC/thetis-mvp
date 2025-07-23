@@ -9,7 +9,7 @@ namespace Thetis.Profiles.Application.Services;
 internal interface IProfileService
 {
     Task<Profile?> GetProfileByIdAsync(Guid profileId, CancellationToken cancellationToken = default);
-    Task<List<Profile>> GetUserProfilesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<List<Profile>> GetProfilesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<Result<Profile>> AddProfileAsync(Profile profile, CancellationToken cancellationToken = default);
     Task<Result<Profile>> UpdateProfileAsync(Profile profile, CancellationToken cancellationToken = default);
     Task<Result<bool>> DeleteProfileAsync(Guid profileId, CancellationToken cancellationToken = default);
@@ -35,32 +35,36 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
         return profile;
     }
 
-    public async Task<List<Profile>> GetUserProfilesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<List<Profile>> GetProfilesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        if (pageNumber > 0 && pageSize > 0)
-            return await repository.ListAsync(sortBy, pageNumber, pageSize, cancellationToken);
+        if (pageNumber <= 0 && pageSize <= 0)
+        {
+            logger.LogWarning("Invalid pagination parameters: pageNumber={PageNumber}, pageSize={PageSize}", pageNumber, pageSize);
+            return [];
+        }
         
-        logger.LogWarning("Invalid pagination parameters: pageNumber={PageNumber}, pageSize={PageSize}", pageNumber, pageSize);
-        return [];
+        var profiles = await repository.ListAsync(sortBy, pageNumber, pageSize, cancellationToken);
+        return profiles;
     }
     
-    public  async Task<Result<Profile>> AddProfileAsync(Profile profile, CancellationToken cancellationToken = default)
+    public async Task<Result<Profile>> AddProfileAsync(Profile profile, CancellationToken cancellationToken = default)
     {
         if (profile.Id == Guid.Empty)
         {
-            profile.Id = Guid.CreateVersion7(); // Ensure profile has a valid ID
+            profile.Id = Guid.CreateVersion7();
         }
 
         try
         {
             await repository.AddAsync(profile, cancellationToken);
+            await repository.SaveChangesAsync(cancellationToken);
             
             logger.LogInformation("Profile {ProfileId} added successfully.", profile.Id);
             return new Result<Profile>(profile);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error adding profile {ProfileId}", profile.Id);
+            logger.LogError(ex, "Failed to add profile {ProfileId}", profile.Id);
             return new Result<Profile>(ex);
         }
         
@@ -71,8 +75,7 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
         if (profile.Id == Guid.Empty)
         {
             logger.LogWarning("Attempted to update a profile with an empty ID.");
-            var ex = new ArgumentException("Profile ID cannot be empty.", nameof(profile));
-            return new Result<Profile>(ex);
+            return new Result<Profile>(new ArgumentException("Profile ID cannot be empty.", nameof(profile)));
         }
 
         try
@@ -82,8 +85,7 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
             if (existingProfile is null)
             {
                 logger.LogWarning("Profile with ID {ProfileId} not found for update.", profile.Id);
-                var ex = new EntityNotFoundException("Profile", profile.Id);
-                return new Result<Profile>(ex);
+                return new Result<Profile>(new EntityNotFoundException("Profile", profile.Id));
             }
             
             // Update the existing profile with the new values
@@ -94,15 +96,15 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
             existingProfile.ModifiedOn = DateTimeOffset.UtcNow;
             
             await repository.Update(existingProfile);
-            
             await repository.SaveChangesAsync(cancellationToken);
+            
             logger.LogInformation("Profile {ProfileId} updated successfully.", profile.Id);
             
             return new Result<Profile>(profile);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error updating profile {ProfileId}", profile.Id);
+            logger.LogError(ex, "Failed to update profile {ProfileId}", profile.Id);
             return new Result<Profile>(ex);
         }
     }
@@ -134,7 +136,7 @@ internal class ProfileService(ILogger<ProfileService> logger, IProfileRepository
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting profile {ProfileId}", profileId);
+            logger.LogError(ex, "Failed to delete profile {ProfileId}", profileId);
             return new Result<bool>(ex);
         }
         

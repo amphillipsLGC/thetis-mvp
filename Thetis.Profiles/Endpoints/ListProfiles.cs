@@ -11,7 +11,7 @@ internal class ListProfilesResponse
     public List<ProfileModel> Profiles { get; set; } = [];
 }
 
-internal class ListProfiles(IProfileService profileService) : EndpointWithoutRequest
+internal class ListProfiles(IProfileService profileService) : EndpointWithoutRequest<ListProfilesResponse>
 {
     public override void Configure()
     {
@@ -32,7 +32,7 @@ internal class ListProfiles(IProfileService profileService) : EndpointWithoutReq
         var pageNumber = Query<int?>("pageNumber", false) ?? 1;
         var pageSize = Query<int?>("pageSize", false) ?? 10;
         
-        var profiles = await profileService.GetUserProfilesAsync(sortBy, pageNumber, pageSize, cancellationToken);
+        var profiles = await profileService.GetProfilesAsync(sortBy, pageNumber, pageSize, cancellationToken);
         
         var response = new ListProfilesResponse
         {

@@ -6,8 +6,8 @@ namespace Thetis.Users.Data;
 internal interface IUserRepository
 {
     Task<User?> GetByIdAsync(Guid userId, bool noTracking, CancellationToken cancellationToken);
+    Task<User?> GetByUsernameAsync(string username, bool noTracking, CancellationToken cancellationToken);
     Task<User?> GetByEmailAsync(string email, bool noTracking, CancellationToken cancellationToken);
-
     Task<List<User>> ListAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken);
     Task AddAsync(User user, CancellationToken cancellationToken);
     Task Update(User user);
@@ -24,7 +24,19 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
             : dbContext.Users;
         
         return await query
+            .Include(i => i.Roles)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+    }
+
+    public Task<User?> GetByUsernameAsync(string username, bool noTracking = false, CancellationToken cancellationToken = default)
+    {
+        var query = noTracking
+            ? dbContext.Users.AsNoTracking()
+            : dbContext.Users;
+
+        return query
+            .Include(i => i.Roles)
+            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
     }
 
     public async Task<User?> GetByEmailAsync(string email, bool noTracking = false, CancellationToken cancellationToken = default)
@@ -34,12 +46,15 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
             : dbContext.Users;
 
         return await query
+            .Include(i => i.Roles)
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     public async Task<List<User>> ListAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var query = dbContext.Users.AsQueryable();
+        var query = dbContext.Users
+            .Include(i => i.Roles)
+            .AsQueryable();
 
         // Apply sorting
         if (!string.IsNullOrEmpty(sortBy))

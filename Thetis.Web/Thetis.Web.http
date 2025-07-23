@@ -2,9 +2,23 @@
 
 // User Endpoints
 
+### Add a new user
+POST {{Thetis_HostAddress}}/users
+Content-Type: application/json
+Accept: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "username": "John.Doe",
+    "email": "jonh.doe@example.com"
+}
+
 ### Get all users
 
-GET {{Thetis_HostAddress}}/users
+@UserPageNumber = 1
+@UserPageSize = 10
+GET {{Thetis_HostAddress}}/users?pageNumber={{UserPageNumber}}&pageSize={{UserPageSize}}
 Accept: application/json
 
 //Profile Endpoints

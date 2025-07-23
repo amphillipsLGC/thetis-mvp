@@ -6,12 +6,12 @@ using Thetis.Users.Application.Services;
 
 namespace Thetis.Users.Endpoints;
 
-public class ListUsersResponse
+internal class ListUsersResponse
 {
     public List<UserModel> Users { get; set; } = [];
 }
 
-internal class ListUsersEndpoint(IUserService userService) : EndpointWithoutRequest<ListUsersResponse>
+internal class ListUsers(IUserService userService) : EndpointWithoutRequest<ListUsersResponse>
 {
     public override void Configure()
     {
@@ -27,11 +27,16 @@ internal class ListUsersEndpoint(IUserService userService) : EndpointWithoutRequ
 
     public override async Task HandleAsync(CancellationToken cancellationToken)
     {
-        var users = await userService.GetAllUsersAsync(cancellationToken);
+        // Extract query parameters
+        var sortBy = Query<string?>("sortBy", false) ?? "CreatedOn";
+        var pageNumber = Query<int?>("pageNumber", false) ?? 1;
+        var pageSize = Query<int?>("pageSize", false) ?? 10;
+        
+        var users = await userService.GetUsersAsync(sortBy, pageNumber, pageSize, cancellationToken);
         
         await SendOkAsync(new ListUsersResponse
         {
-            Users = users
+            Users = users.Select(p => p.ToModel()).ToList()
         }, cancellation: cancellationToken);
     }
 }
