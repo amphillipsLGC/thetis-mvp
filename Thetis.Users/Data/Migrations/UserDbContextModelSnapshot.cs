@@ -17,7 +17,7 @@ namespace Thetis.Users.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Users")
+                .HasDefaultSchema("User")
                 .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -44,7 +44,7 @@ namespace Thetis.Users.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Roles", "Users");
+                    b.ToTable("Roles", "User");
                 });
 
             modelBuilder.Entity("Thetis.Users.Domain.RoleClaim", b =>
@@ -70,7 +70,7 @@ namespace Thetis.Users.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaims", "Users");
+                    b.ToTable("RoleClaims", "User");
                 });
 
             modelBuilder.Entity("Thetis.Users.Domain.User", b =>
@@ -125,7 +125,7 @@ namespace Thetis.Users.Data.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", "Users");
+                    b.ToTable("Users", "User");
                 });
 
             modelBuilder.Entity("Thetis.Users.Domain.UserRole", b =>
@@ -140,7 +140,7 @@ namespace Thetis.Users.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles", "Users");
+                    b.ToTable("UserRoles", "User");
                 });
 
             modelBuilder.Entity("Thetis.Users.Domain.RoleClaim", b =>

@@ -12,11 +12,11 @@ namespace Thetis.Users.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "Users");
+                name: "User");
 
             migrationBuilder.CreateTable(
                 name: "Roles",
-                schema: "Users",
+                schema: "User",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -30,7 +30,7 @@ namespace Thetis.Users.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Users",
-                schema: "Users",
+                schema: "User",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -52,7 +52,7 @@ namespace Thetis.Users.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "RoleClaims",
-                schema: "Users",
+                schema: "User",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -66,7 +66,7 @@ namespace Thetis.Users.Data.Migrations
                     table.ForeignKey(
                         name: "FK_RoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "Users",
+                        principalSchema: "User",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -74,7 +74,7 @@ namespace Thetis.Users.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserRoles",
-                schema: "Users",
+                schema: "User",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -86,14 +86,14 @@ namespace Thetis.Users.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "Users",
+                        principalSchema: "User",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "Users",
+                        principalSchema: "User",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -101,33 +101,33 @@ namespace Thetis.Users.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
-                schema: "Users",
+                schema: "User",
                 table: "RoleClaims",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_Name",
-                schema: "Users",
+                schema: "User",
                 table: "Roles",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
-                schema: "Users",
+                schema: "User",
                 table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
-                schema: "Users",
+                schema: "User",
                 table: "Users",
                 column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Username",
-                schema: "Users",
+                schema: "User",
                 table: "Users",
                 column: "Username",
                 unique: true);
@@ -138,19 +138,19 @@ namespace Thetis.Users.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "RoleClaims",
-                schema: "Users");
+                schema: "User");
 
             migrationBuilder.DropTable(
                 name: "UserRoles",
-                schema: "Users");
+                schema: "User");
 
             migrationBuilder.DropTable(
                 name: "Roles",
-                schema: "Users");
+                schema: "User");
 
             migrationBuilder.DropTable(
                 name: "Users",
-                schema: "Users");
+                schema: "User");
         }
     }
 }
