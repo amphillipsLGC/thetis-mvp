@@ -42,6 +42,7 @@ internal class UserRole
 
 internal class RoleClaim
 {
+    public Guid Id { get; set; } = Guid.CreateVersion7();
     public Guid RoleId { get; set; }
     public string ClaimType { get; set; } = string.Empty;
     public string ClaimValue { get; set; } = string.Empty;

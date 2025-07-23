@@ -32,3 +32,21 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasForeignKey(k => k.RoleId);
     }
 }
+
+internal class RoleClaimConfiguration : IEntityTypeConfiguration<RoleClaim>
+{
+    public void Configure(EntityTypeBuilder<RoleClaim> builder)
+    {
+        builder.ToTable("RoleClaims");
+
+        builder.HasKey(rc => rc.Id);
+
+        builder.Property(rc => rc.ClaimType)
+            .IsRequired()
+            .HasMaxLength(DataSchemaConstants.DefaultClaimLength);
+
+        builder.Property(rc => rc.ClaimValue)
+            .IsRequired()
+            .HasMaxLength(DataSchemaConstants.DefaultClaimLength);
+    }
+}

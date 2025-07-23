@@ -35,26 +35,27 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.PasswordHash)
             .HasMaxLength(512);
-        
-        builder.HasData(GetDefaultUsers());
 
         builder.HasMany(u => u.Roles)
             .WithOne(r =>   r.User)
             .HasForeignKey(k => k.UserId);
-
     }
-    
-    private IEnumerable<User> GetDefaultUsers()
+}
+
+internal class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
+{
+    public void Configure(EntityTypeBuilder<UserRole> builder)
     {
-        // Password is Admin123!
-        yield return new User
-        {
-            Id = Guid.CreateVersion7(),
-            FirstName = "Admin",
-            LastName = "User",
-            Username = "admin",
-            EmailVerified = true,
-            PasswordHash = "gw5du/XgGNMDFbSNI/XBaA==:0tiw1hzqokOFaWVslwT+rM0eFUeLE71nSUmKYkzAE9s="
-        };
+        builder.ToTable("UserRoles");
+
+        builder.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+        builder.HasOne(ur => ur.User)
+            .WithMany(u => u.Roles)
+            .HasForeignKey(ur => ur.UserId);
+
+        builder.HasOne(ur => ur.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(ur => ur.RoleId);
     }
 }

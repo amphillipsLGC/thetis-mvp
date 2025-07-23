@@ -16,6 +16,21 @@ Thetis.Profiles is a C# library for managing clinical narrative profiles and the
 - **DataRequirementRule**: Defines a property, operator, and value for data validation.
 - **RuleOperator**: Enumeration of supported rule operators (Equals, NotEquals, Contains, etc.).
 
+## Database Migrations
+
+To set up the database for Thetis.Profiles, you need to run the Entity Framework Core migrations. Ensure you have the necessary packages installed and then execute the following command in your terminal 
+from the Thetis.Web project directory:
+
+```shell
+dotnet ef migrations add Initial -c UserDbContext -p ../Thetis.Users/Thetis.Users.csproj -s ./Thetis.Web.csproj -o Data/Migrations
+```
+
+To apply the migrations to your database, run:
+
+```shell
+dotnet ef database update -c UserDbContext
+```
+
 ## Example Usage
 
 ```csharp

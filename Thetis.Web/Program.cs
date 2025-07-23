@@ -28,7 +28,6 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("ExposeO
         options
             .WithTitle("Thetis API")
             .WithTheme(ScalarTheme.Default);
-
     });
 }
 
