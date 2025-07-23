@@ -1,6 +1,7 @@
 ﻿using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
 using Thetis.Common.Exceptions;
+using Thetis.Users.Application.Models;
 using Thetis.Users.Data;
 using Thetis.Users.Domain;
 
@@ -8,15 +9,17 @@ namespace Thetis.Users.Application.Services;
 
 internal interface IUserService
 {
-    Task<Result<User>> AddUserAsync(User user, CancellationToken cancellationToken = default);
+    Task<Result<User>> AddUserAsync(UserModel model, CancellationToken cancellationToken = default);
     Task<Result<User>> UpdateUserAsync(User user, CancellationToken cancellationToken = default);
     Task<List<User>> GetUsersAsync(string sortBy, int pageNubmer, int pageSize, CancellationToken cancellationToken);
 }
 
 internal class UserService(ILogger<UserService> logger, IUserRepository repository) : IUserService
 {
-    public async Task<Result<User>> AddUserAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<Result<User>> AddUserAsync(UserModel model, CancellationToken cancellationToken = default)
     {
+        var user = model.ToEntity();
+        
         if (user.Id == Guid.Empty)
         {
             user.Id = Guid.CreateVersion7();
@@ -26,16 +29,24 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
         if(user.Username is not null && await repository.GetByUsernameAsync(user.Username, noTracking: true, cancellationToken) is not null)
         {
             logger.LogWarning("Username {Username} already exists.", user.Username);
-            //TODO: Create a custom exception for this
-            return new Result<User>(new ArgumentException("Username is already in use.", user.Username));
+            return new Result<User>(new UsernameAlreadyInUseException(user.Username));
         }
         
         // Check if Email is already in use
         if(user.Email is not null && await repository.GetByEmailAsync(user.Email, noTracking: true, cancellationToken) is not null)
         {
             logger.LogWarning("Email {Email} already exists.", user.Email);
-            //TODO: Create a custom exception for this
-            return new Result<User>(new ArgumentException("Email is already in use.", user.Email));
+            return new Result<User>(new EmailAlreadyInUseException(user.Email));
+        }
+        
+        // Add roles if any selected
+        if (model.Roles is not null && model.Roles.Count > 0)
+        {
+            foreach (var role in model.Roles)
+            {
+                // get role from repository
+                //user.Roles.Add();
+            }
         }
 
         try

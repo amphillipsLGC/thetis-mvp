@@ -8,10 +8,10 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "firstName": "John",
+    "firstName": "Johnny",
     "lastName": "Doe",
-    "username": "John.Doe",
-    "email": "jonh.doe@example.com"
+    "username": "Johnnny.Doe",
+    "email": "johnnny.doe@example.com"
 }
 
 ### Get all users

@@ -8,11 +8,11 @@ internal record UserModel(
     string LastName, 
     string? Username, 
     string? Email, 
-    bool EmailVerified, 
-    DateTimeOffset CreatedOn, 
-    DateTimeOffset? UpdatedOn, 
-    DateTimeOffset? LastLogin, 
-    bool IsDeleted);
+    bool EmailVerified,
+    List<UserRoleModel>? Roles
+);
+
+internal record UserRoleModel(Guid RoleId, string RoleName);
 
 internal static class UserExtensions
 {
@@ -25,10 +25,8 @@ internal static class UserExtensions
             user.Username,
             user.Email,
             user.EmailVerified,
-            user.CreatedOn,
-            user.UpdatedOn,
-            user.LastLogin,
-            user.IsDeleted);
+            user.Roles.Select(r => new UserRoleModel(r.RoleId, r.Role.Name)).ToList()
+        );
     }
     
     public static User ToEntity(this UserModel model)
@@ -40,11 +38,7 @@ internal static class UserExtensions
             LastName = model.LastName,
             Username = model.Username,
             Email = model.Email,
-            EmailVerified = model.EmailVerified,
-            CreatedOn = model.CreatedOn,
-            UpdatedOn = model.UpdatedOn,
-            LastLogin = model.LastLogin,
-            IsDeleted = model.IsDeleted
+            EmailVerified = model.EmailVerified
         };
     }
     
