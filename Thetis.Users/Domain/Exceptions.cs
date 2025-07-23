@@ -34,3 +34,20 @@ internal class EmailAlreadyInUseException : Exception
     {
     }
 }
+
+internal class RoleNameAlreadyExistsException : Exception
+{
+    public RoleNameAlreadyExistsException()
+    {
+    }
+
+    public RoleNameAlreadyExistsException(string roleName)
+        : base($"Role name '{roleName}' already exists.")
+    {
+    }
+
+    public RoleNameAlreadyExistsException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}

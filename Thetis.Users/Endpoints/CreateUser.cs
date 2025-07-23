@@ -26,17 +26,18 @@ internal class CreateUser(IUserService userService) : Endpoint<UserModel>
         var result = await userService.AddUserAsync(request, cancellationToken);
 
         await result.Match(
-            success => SendAsync(success.ToModel(), StatusCodes.Status201Created, cancellation: cancellationToken),
+            success => 
+                SendAsync(success.ToModel(), StatusCodes.Status201Created, cancellation: cancellationToken),
             error => error switch
             {
-                UsernameAlreadyInUseException _ => SendAsync(new ProblemDetails
+                UsernameAlreadyInUseException => SendAsync(new ProblemDetails
                     {
                         Status = StatusCodes.Status409Conflict,
                         Detail = "The username is already in use. Please choose a different username.",
                         TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier
                     }, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken
                 ),
-                EmailAlreadyInUseException _ => SendAsync(new ProblemDetails
+                EmailAlreadyInUseException => SendAsync(new ProblemDetails
                     {
                         Status = StatusCodes.Status409Conflict,
                         Detail = "The email address is already in use. Please choose a different email.",

@@ -1,7 +1,5 @@
 @Thetis_HostAddress = http://localhost:5032
 
-// User Endpoints
-
 ### Add a new user
 POST {{Thetis_HostAddress}}/users
 Content-Type: application/json
@@ -21,7 +19,15 @@ Accept: application/json
 GET {{Thetis_HostAddress}}/users?pageNumber={{UserPageNumber}}&pageSize={{UserPageSize}}
 Accept: application/json
 
-//Profile Endpoints
+### Add a new role
+POST {{Thetis_HostAddress}}/roles
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Administrator",
+    "description": "Administrator role with full access"
+}
 
 ### Get profile by ID
 

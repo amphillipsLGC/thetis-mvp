@@ -142,7 +142,7 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
         if (pageNubmer <= 0 || pageSize <= 0)
         {
             logger.LogWarning("Invalid pagination parameters: pageNumber={PageNumber}, pageSize={PageSize}", pageNubmer, pageSize);
-            return [];
+            throw new ArgumentException("Page number and page size must be greater than zero.", nameof(pageNubmer));
         }
 
         var users = await repository.ListAsync(sortBy, pageNubmer, pageSize, cancellationToken);

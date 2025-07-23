@@ -22,13 +22,13 @@ To set up the database for Thetis.Profiles, you need to run the Entity Framework
 from the Thetis.Web project directory:
 
 ```shell
-dotnet ef migrations add Initial -c UserDbContext -p ../Thetis.Users/Thetis.Users.csproj -s ./Thetis.Web.csproj -o Data/Migrations
+dotnet ef migrations add Initial -c ProfileDbContext -p ../Thetis.Profiles/Thetis.Profiles.csproj -s ./Thetis.Web.csproj -o Data/Migrations
 ```
 
 To apply the migrations to your database, run:
 
 ```shell
-dotnet ef database update -c UserDbContext
+dotnet ef database update -c ProfileDbContext
 ```
 
 ## Example Usage

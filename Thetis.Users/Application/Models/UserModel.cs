@@ -41,5 +41,4 @@ internal static class UserExtensions
             EmailVerified = model.EmailVerified
         };
     }
-    
 }
