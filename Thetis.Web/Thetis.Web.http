@@ -1,5 +1,42 @@
 @Thetis_HostAddress = http://localhost:5032
 
+### Add a new role
+POST {{Thetis_HostAddress}}/roles
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Administrator2",
+  "description": "Administrator2 role with full access"
+}
+
+### Update an existing role
+@Role_Id = 019839f4-9200-7a03-bec2-8eadbb236e0c
+PUT {{Thetis_HostAddress}}/roles/{{Role_Id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "{{Role_Id}}",
+  "name": "Administrator2",
+  "description": "Updated description for Administrator2 role"
+}
+
+### Get role by ID
+GET {{Thetis_HostAddress}}/roles/{{Role_Id}}
+Accept: application/json
+
+### Delete a role
+DELETE {{Thetis_HostAddress}}/roles/{{Role_Id}}
+Accept: application/json
+
+### Get all roles
+@RolePageNumber = 1
+@RolePageSize = 10
+GET {{Thetis_HostAddress}}/roles?pageNumber={{RolePageNumber}}&pageSize={{RolePageSize}}
+Accept: application/json
+
+
 ### Add a new user
 POST {{Thetis_HostAddress}}/users
 Content-Type: application/json
@@ -18,16 +55,6 @@ Accept: application/json
 @UserPageSize = 10
 GET {{Thetis_HostAddress}}/users?pageNumber={{UserPageNumber}}&pageSize={{UserPageSize}}
 Accept: application/json
-
-### Add a new role
-POST {{Thetis_HostAddress}}/roles
-Content-Type: application/json
-Accept: application/json
-
-{
-    "name": "Administrator",
-    "description": "Administrator role with full access"
-}
 
 ### Get profile by ID
 

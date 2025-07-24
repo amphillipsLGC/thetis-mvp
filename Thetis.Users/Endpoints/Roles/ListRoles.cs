@@ -1,24 +1,24 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Thetis.Profiles.Application.Models;
-using Thetis.Profiles.Application.Services;
+using Thetis.Users.Application.Models;
+using Thetis.Users.Application.Services;
 
-namespace Thetis.Profiles.Endpoints;
+namespace Thetis.Users.Endpoints.Roles;
 
-internal class ListProfilesResponse
+internal class ListRolesResponse
 {
-    public List<ProfileModel> Profiles { get; set; } = [];
+    public List<RoleModel> Roles { get; set; } = [];
 }
 
-internal class ListProfiles(IProfileService profileService) : EndpointWithoutRequest<ListProfilesResponse>
+internal class ListRoles(IRoleService roleService) : EndpointWithoutRequest<ListRolesResponse>
 {
     public override void Configure()
     {
-        Get("/profiles");
+        Get("/roles");
         Description(x => x
-            .WithName("List all profiles")
-            .Produces<ListProfilesResponse>(200)
+            .WithName("List all roles")
+            .Produces<ListRolesResponse>(200)
             .ProducesProblem(400)
             .ProducesProblem(500));
         AllowAnonymous();
@@ -31,14 +31,13 @@ internal class ListProfiles(IProfileService profileService) : EndpointWithoutReq
         var pageNumber = Query<int?>("pageNumber", false) ?? 1;
         var pageSize = Query<int?>("pageSize", false) ?? 10;
         
-        var profiles = await profileService.GetProfilesAsync(sortBy, pageNumber, pageSize, cancellationToken);
+        var roles = await roleService.GetRolesAsync(sortBy, pageNumber, pageSize, cancellationToken);
         
-        var response = new ListProfilesResponse
+        var response = new ListRolesResponse
         {
-            Profiles = profiles.Select(p => p.ToModel()).ToList()
+            Roles = roles.Select(r => r.ToModel()).ToList()
         };
         
         await SendOkAsync(response, cancellation: cancellationToken);
     }
-    
 }

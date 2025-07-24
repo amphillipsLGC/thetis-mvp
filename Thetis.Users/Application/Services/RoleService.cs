@@ -13,7 +13,10 @@ internal interface IRoleService
 {
     Task<Result<Role>> AddRoleAsync(RoleModel model, CancellationToken cancellationToken = default);
     Task<Result<Role>> UpdateRoleAsync(RoleModel role, CancellationToken cancellationToken = default);
-    Task<List<Role>> GetRolesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken);
+    Task<Result<bool>> DeleteRoleAsync(Guid roleId, CancellationToken cancellationToken = default);
+    Task<Result<Role>> GetRoleByIdAsync(Guid roleId, CancellationToken cancellationToken = default);
+    Task<Result<Role>> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken = default);
+    Task<List<Role>> GetRolesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 
 internal class RoleService(ILogger<RoleService> logger, IRoleRepository repository) : IRoleService
@@ -113,6 +116,87 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             logger.LogError(ex, "Failed to update role {RoleName}.", entity.Name);
             throw;
         }
+    }
+
+    public async Task<Result<bool>> DeleteRoleAsync(Guid roleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("Users.RoleService.DeleteRoleAsync");
+        
+        if (roleId == Guid.Empty)
+        {
+            logger.LogWarning("Attempted to delete a role with an empty ID.");
+            return new Result<bool>(new ArgumentException("Role ID cannot be empty.", nameof(roleId)));
+        }
+        
+        var role = await repository.GetByIdAsync(roleId, noTracking: false, cancellationToken);
+        
+        if (role is null)
+        {
+            logger.LogWarning("Role with ID {RoleId} not found.", roleId);
+            return new Result<bool>(new EntityNotFoundException("Role", roleId));
+        }
+
+        try
+        {
+            await repository.Delete(role);
+            await repository.SaveChangesAsync(cancellationToken);
+            
+            logger.LogInformation("Role {RoleId} deleted successfully.", roleId);
+            return new Result<bool>(true);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("RoleId", roleId.ToString());
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to delete role {RoleName}.", roleId);
+            throw;
+        }
+
+        
+    }
+
+    public async Task<Result<Role>> GetRoleByIdAsync(Guid roleId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("Users.RoleService.GetRoleByIdAsync");
+        
+        if (roleId == Guid.Empty)
+        {
+            logger.LogWarning("Attempted to get a role with an empty ID.");
+            return new Result<Role>(new ArgumentException("Role ID cannot be empty.", nameof(roleId)));
+        }
+        
+        var role = await repository.GetByIdAsync(roleId, noTracking: true, cancellationToken);
+        
+        if (role is null)
+        {
+            logger.LogWarning("Role with ID {RoleId} not found.", roleId);
+            return new Result<Role>(new EntityNotFoundException("Role", roleId));
+        }
+        
+        return new Result<Role>(role);
+    }
+
+    public async Task<Result<Role>> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("Users.RoleService.GetRoleByNameAsync");
+        
+        if (string.IsNullOrWhiteSpace(roleName))
+        {
+            logger.LogWarning("Attempted to get a role with an empty name.");
+            return new Result<Role>(new ArgumentException("Role name cannot be empty.", nameof(roleName)));
+        }
+        
+        var role = await repository.GetByNameAsync(roleName, noTracking: true, cancellationToken);
+        
+        if (role is null)
+        {
+            logger.LogWarning("Role with name {RoleName} not found.", roleName);
+            return new Result<Role>(new EntityNotFoundException("Role", roleName));
+        }
+        
+        return new Result<Role>(role);
     }
 
     public async Task<List<Role>> GetRolesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
