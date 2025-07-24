@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
 
-namespace Thetis.Users.Endpoints;
+namespace Thetis.Users.Endpoints.Users;
 
 internal class ListUsersResponse
 {

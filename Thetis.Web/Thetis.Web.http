@@ -7,11 +7,21 @@ Accept: application/json
 
 {
   "name": "Administrator2",
-  "description": "Administrator2 role with full access"
+  "description": "Administrator2 role with full access",
+  "claims": [
+    {
+      "claimType": "Permission",
+      "claimValue": "CanCreateProfiles"
+    },
+    {
+      "claimType": "Permission",
+      "claimValue": "CanAdministerSystem"
+    }
+  ]
 }
 
 ### Update an existing role
-@Role_Id = 019839f4-9200-7a03-bec2-8eadbb236e0c
+@Role_Id = 01983c11-035e-7e8c-9c65-98150b86616e
 PUT {{Thetis_HostAddress}}/roles/{{Role_Id}}
 Content-Type: application/json
 Accept: application/json
@@ -19,7 +29,21 @@ Accept: application/json
 {
   "id": "{{Role_Id}}",
   "name": "Administrator2",
-  "description": "Updated description for Administrator2 role"
+  "description": "Updated description for Administrator2 role",
+  "claims": [
+    {
+      "claimType": "Permission",
+      "claimValue": "CanCreateProfiles"
+    },
+    {
+      "claimType": "Permission",
+      "claimValue": "CanPublishToFhirServer"
+    },
+    {
+      "claimType": "Permission",
+      "claimValue": "CanAdministerSystem"
+    }
+  ]
 }
 
 ### Get role by ID

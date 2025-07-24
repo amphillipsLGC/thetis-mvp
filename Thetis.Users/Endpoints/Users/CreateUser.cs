@@ -6,7 +6,7 @@ using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
 using Thetis.Users.Domain;
 
-namespace Thetis.Users.Endpoints;
+namespace Thetis.Users.Endpoints.Users;
 
 internal class CreateUser(IUserService userService) : Endpoint<UserModel>
 {

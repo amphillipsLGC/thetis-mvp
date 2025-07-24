@@ -14,7 +14,7 @@ internal record RoleClaimModel(Guid Id, string ClaimType, string ClaimValue);
 
 internal static class RoleExtensions
 {
-    public static RoleModel ToModel(this Domain.Role role)
+    public static RoleModel ToModel(this Role role)
     {
         return new RoleModel(
             role.Id,

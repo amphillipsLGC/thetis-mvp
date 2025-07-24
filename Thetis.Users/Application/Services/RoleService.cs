@@ -41,6 +41,17 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
                 return new Result<Role>(new RoleNameAlreadyExistsException(role.Name));
             }
             
+            // Set claims if any provided
+            if (model.Claims is not null)
+            {
+                role.Claims = model.Claims.Select(c => new RoleClaim
+                {
+                    Id = Guid.CreateVersion7(),
+                    ClaimType = c.ClaimType,
+                    ClaimValue = c.ClaimValue
+                }).ToList();
+            }
+            
             await repository.AddAsync(role, cancellationToken);
             await repository.SaveChangesAsync(cancellationToken);
             
@@ -49,7 +60,10 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
         }
         catch (Exception ex)
         {
-            Activity.Current?.AddTag("Role", JsonSerializer.Serialize(role));
+            Activity.Current?.AddTag("Role", JsonSerializer.Serialize(role, new JsonSerializerOptions
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            }));
             Activity.Current?.AddTag("exception", ex.Message);
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
@@ -71,7 +85,7 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
 
         try
         {
-            var existingRole = await repository.GetByIdAsync(entity.Id, noTracking: true, cancellationToken);
+            var existingRole = await repository.GetByIdAsync(entity.Id, noTracking: false, cancellationToken);
             
             if (existingRole is null)
             {
@@ -94,22 +108,54 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
                 existingRole.Name = role.Name;
             }
             
-            // Update claims if provided
+            // Update claims
             if (role.Claims is not null)
             {
-                //TODO: Handle claims update logic here
+                // Add new claims
+                foreach (var claim in role.Claims)
+                {
+                    if (existingRole.Claims.All(c => c.ClaimValue != claim.ClaimValue))
+                    {
+                        var newClaim = new RoleClaim
+                        {
+                            Id = Guid.CreateVersion7(),
+                            ClaimType = claim.ClaimType,
+                            ClaimValue = claim.ClaimValue,
+                            RoleId = existingRole.Id
+                        };
+                        existingRole.Claims.Add(newClaim);
+                        
+                        // Set the state to Added for EF Core tracking, this is due to 
+                        // issues with the change tracker not recognizing new claims
+                        repository.DbContext.Entry(newClaim)
+                            .State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    }
+                }
+
+                // Remove claims that are no longer present
+                var claimsToRemove = existingRole.Claims
+                    .Where(c => role.Claims.All(rc => rc.ClaimValue != c.ClaimValue))
+                    .ToList();
+
+                foreach (var claim in claimsToRemove)
+                {
+                    existingRole.Claims.Remove(claim);
+                }
             }
 
-            await repository.Update(entity);
+            //await repository.Update(existingRole);
             await repository.SaveChangesAsync(cancellationToken);
             
             logger.LogInformation("Role {RoleId} updated successfully.", entity.Id);
             
-            return new Result<Role>(entity);
+            return new Result<Role>(existingRole);
         }
         catch (Exception ex)
         {
-            Activity.Current?.AddTag("Role", JsonSerializer.Serialize(entity));
+            Activity.Current?.AddTag("Role", JsonSerializer.Serialize(entity, new JsonSerializerOptions
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            }));
             Activity.Current?.AddTag("exception", ex.Message);
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
