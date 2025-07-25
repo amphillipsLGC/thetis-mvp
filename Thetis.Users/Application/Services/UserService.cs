@@ -199,16 +199,28 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             logger.LogWarning("Attempted to get user with empty ID.");
             return new Result<User>(new ArgumentException("User ID cannot be empty.", nameof(userId)));
         }
-        
-        var user = await repository.GetByIdAsync(userId, noTracking: true, cancellationToken);
 
-        if (user is null)
+        try
         {
-            logger.LogWarning("User with ID {UserId} not found.", userId);
-            return new Result<User>(new EntityNotFoundException("User", userId));
-        }
+            var user = await repository.GetByIdAsync(userId, noTracking: true, cancellationToken);
+
+            if (user is null)
+            {
+                logger.LogWarning("User with ID {UserId} not found.", userId);
+                return new Result<User>(new EntityNotFoundException("User", userId));
+            }
         
-        return new Result<User>(user);
+            return new Result<User>(user);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("user.id", userId.ToString());
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to retrieve user by ID {UserId}", userId);
+            return new Result<User>(ex);
+        }
     }
 
     public async Task<Result<User>> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -220,16 +232,28 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             logger.LogWarning("Attempted to get user with empty email.");
             return new Result<User>(new ArgumentException("Email cannot be empty.", nameof(email)));
         }
-        
-        var user = await repository.GetByEmailAsync(email, noTracking: true, cancellationToken);
 
-        if (user is null)
+        try
         {
-            logger.LogWarning("User with email {Email} not found.", email);
-            return new Result<User>(new EntityNotFoundException("User", email));
-        }
+            var user = await repository.GetByEmailAsync(email, noTracking: true, cancellationToken);
+
+            if (user is null)
+            {
+                logger.LogWarning("User with email {Email} not found.", email);
+                return new Result<User>(new EntityNotFoundException("User", email));
+            }
         
-        return new Result<User>(user);
+            return new Result<User>(user);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("email", email);
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to retrieve user by email {Email}", email);
+            return new Result<User>(ex);
+        }
     }
 
     public async Task<List<User>> GetUsersAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
@@ -256,6 +280,5 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             logger.LogError(ex, "Failed to retrieve users with sortBy={SortBy}, pageNumber={PageNumber}, pageSize={PageSize}", sortBy, pageNumber, pageSize);
             throw;
         }
-        
     }
 }

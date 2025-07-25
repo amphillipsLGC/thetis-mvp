@@ -205,16 +205,28 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             logger.LogWarning("Attempted to get a role with an empty ID.");
             return new Result<Role>(new ArgumentException("Role ID cannot be empty.", nameof(roleId)));
         }
-        
-        var role = await repository.GetByIdAsync(roleId, noTracking: true, cancellationToken);
-        
-        if (role is null)
+
+        try
         {
-            logger.LogWarning("Role with ID {RoleId} not found.", roleId);
-            return new Result<Role>(new EntityNotFoundException("Role", roleId));
-        }
+            var role = await repository.GetByIdAsync(roleId, noTracking: true, cancellationToken);
         
-        return new Result<Role>(role);
+            if (role is null)
+            {
+                logger.LogWarning("Role with ID {RoleId} not found.", roleId);
+                return new Result<Role>(new EntityNotFoundException("Role", roleId));
+            }
+        
+            return new Result<Role>(role);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("role.id", roleId.ToString());
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to retrieve role by ID {RoleId}.", roleId);
+            throw;
+        }
     }
 
     public async Task<Result<Role>> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken = default)
@@ -226,16 +238,28 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             logger.LogWarning("Attempted to get a role with an empty name.");
             return new Result<Role>(new ArgumentException("Role name cannot be empty.", nameof(roleName)));
         }
-        
-        var role = await repository.GetByNameAsync(roleName, noTracking: true, cancellationToken);
-        
-        if (role is null)
+
+        try
         {
-            logger.LogWarning("Role with name {RoleName} not found.", roleName);
-            return new Result<Role>(new EntityNotFoundException("Role", roleName));
-        }
+            var role = await repository.GetByNameAsync(roleName, noTracking: true, cancellationToken);
         
-        return new Result<Role>(role);
+            if (role is null)
+            {
+                logger.LogWarning("Role with name {RoleName} not found.", roleName);
+                return new Result<Role>(new EntityNotFoundException("Role", roleName));
+            }
+        
+            return new Result<Role>(role);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("role.name", roleName);
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to retrieve role by name {RoleName}.", roleName);
+            throw;
+        }
     }
 
     public async Task<List<Role>> GetRolesAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
