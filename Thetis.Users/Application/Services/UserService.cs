@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using FastEndpoints;
 using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
 using Thetis.Common.Exceptions;
@@ -15,6 +14,7 @@ internal interface IUserService
 {
     Task<Result<User>> AddUserAsync(UserModel model, CancellationToken cancellationToken = default);
     Task<Result<User>> UpdateUserAsync(UserModel user, CancellationToken cancellationToken = default);
+    Task<Result<bool>> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Result<User>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Result<User>> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<List<User>> GetUsersAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken);
@@ -190,6 +190,43 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
         }
     }
 
+    public async Task<Result<bool>> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("UserService.DeleteUserAsync");
+        
+        if (userId == Guid.Empty)
+        {
+            logger.LogWarning("Attempted to delete user with empty ID.");
+            return new Result<bool>(new ArgumentException("User ID cannot be empty.", nameof(userId)));
+        }
+
+        try
+        {
+            var user = await repository.GetByIdAsync(userId, noTracking: false, cancellationToken);
+            
+            if (user is null)
+            {
+                logger.LogWarning("User {UserId} not found for deletion.", userId);
+                return new Result<bool>(new EntityNotFoundException("User", userId));
+            }
+            
+            await repository.Delete(user);
+            await repository.SaveChangesAsync(cancellationToken);
+            
+            logger.LogInformation("User {UserId} deleted successfully.", user.Id);
+            return new Result<bool>(true);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("user.id", userId.ToString());
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to delete user {UserId}", userId);
+            throw;
+        }
+    }
+
     public async Task<Result<User>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.Current?.Source.StartActivity("UserService.GetUserByIdAsync");
@@ -219,7 +256,7 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
             logger.LogError(ex, "Failed to retrieve user by ID {UserId}", userId);
-            return new Result<User>(ex);
+            throw;
         }
     }
 
@@ -252,7 +289,7 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
             logger.LogError(ex, "Failed to retrieve user by email {Email}", email);
-            return new Result<User>(ex);
+            throw;
         }
     }
 

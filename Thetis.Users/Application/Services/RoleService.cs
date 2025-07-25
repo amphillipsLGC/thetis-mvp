@@ -166,17 +166,17 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             logger.LogWarning("Attempted to delete a role with an empty ID.");
             return new Result<bool>(new ArgumentException("Role ID cannot be empty.", nameof(roleId)));
         }
-        
-        var role = await repository.GetByIdAsync(roleId, noTracking: false, cancellationToken);
-        
-        if (role is null)
-        {
-            logger.LogWarning("Role with ID {RoleId} not found.", roleId);
-            return new Result<bool>(new EntityNotFoundException("Role", roleId));
-        }
 
         try
         {
+            var role = await repository.GetByIdAsync(roleId, noTracking: false, cancellationToken);
+        
+            if (role is null)
+            {
+                logger.LogWarning("Role with ID {RoleId} not found.", roleId);
+                return new Result<bool>(new EntityNotFoundException("Role", roleId));
+            }
+            
             await repository.Delete(role);
             await repository.SaveChangesAsync(cancellationToken);
             
@@ -192,8 +192,6 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             logger.LogError(ex, "Failed to delete role {RoleName}.", roleId);
             throw;
         }
-
-        
     }
 
     public async Task<Result<Role>> GetRoleByIdAsync(Guid roleId, CancellationToken cancellationToken = default)

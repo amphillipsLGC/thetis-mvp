@@ -2,22 +2,18 @@ using System.Diagnostics;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 using Thetis.Common.Exceptions;
 using Thetis.Users.Application.Services;
 
-namespace Thetis.Users.Endpoints.Roles;
+namespace Thetis.Users.Endpoints.Users;
 
-internal class DeleteRole(IRoleService roleService) : EndpointWithoutRequest
+internal class DeleteUser(IUserService userService) : EndpointWithoutRequest
 {
     public override void Configure()
     {
-        Delete("/roles/{id}");
-        AllowAnonymous();
+        Delete("/users/{id}");
         Description(x => x
-            .WithName("Delete a role")
-            .Produces<NoContent>(204)
+            .WithName("Delete a user")
             .ProducesProblem(400)
             .ProducesProblem(404)
             .ProducesProblem(500));
@@ -28,19 +24,19 @@ internal class DeleteRole(IRoleService roleService) : EndpointWithoutRequest
     {
         var id = Route<string>("id");
         
-        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out var roleId))
+        if(string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out var userId))
         {
             await SendAsync(new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Invalid profile ID format.",
+                Detail = "Invalid user ID format.",
                 TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
             }, StatusCodes.Status400BadRequest, cancellationToken);
             return;
         }
-
-        var result = await roleService.DeleteRoleAsync(roleId, cancellationToken);
-
+        
+        var result = await userService.DeleteUserAsync(userId, cancellationToken);
+        
         await result.Match(
             success => SendAsync(null, StatusCodes.Status204NoContent, cancellation: cancellationToken),
             error => error switch
@@ -48,18 +44,19 @@ internal class DeleteRole(IRoleService roleService) : EndpointWithoutRequest
                 EntityNotFoundException => SendAsync(new ProblemDetails
                 {
                     Status = StatusCodes.Status404NotFound,
-                    Detail = $"Role with ID {roleId} not found.",
+                    Detail = $"User with ID {userId} not found.",
                     TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
                 }, StatusCodes.Status404NotFound, cancellation: cancellationToken),
                 _ => SendAsync(new ProblemDetails
                 {
                     Status = StatusCodes.Status500InternalServerError,
-                    Detail = $"An unexpected error occurred while deleting the role. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
+                    Detail = $"An unexpected error occurred while deleting the user. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
                     TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
                 }, StatusCodes.Status500InternalServerError, cancellation: cancellationToken)
             }
         );
+        
 
+        
     }
-    
 }
