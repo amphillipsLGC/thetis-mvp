@@ -6,16 +6,16 @@ using Thetis.Common.Exceptions;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
 
-namespace Thetis.Users.Endpoints.Roles;
+namespace Thetis.Users.Endpoints.Users;
 
-internal class GetRoleById(IRoleService roleService) : EndpointWithoutRequest
+internal class GetUserById(IUserService userService) : EndpointWithoutRequest
 {
     public override void Configure()
     {
-        Get("/roles/{id}");
+        Get("/users/{id}");
         Description(x => x
-            .WithName("GetRoleById")
-            .Produces<RoleModel>(200)
+            .WithName("Get user by ID")
+            .Produces<UserModel>(200)
             .ProducesProblem(404)
             .ProducesProblem(500));
         AllowAnonymous();
@@ -25,19 +25,19 @@ internal class GetRoleById(IRoleService roleService) : EndpointWithoutRequest
     {
         var id = Route<string>("id");
         
-        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out var roleId))
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out var userId))
         {
             await SendAsync(new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Invalid role ID format.",
+                Detail = "Invalid user ID format.",
                 TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
             }, StatusCodes.Status400BadRequest, cancellationToken);
             return;
         }
-
-        var result = await roleService.GetRoleByIdAsync(roleId, cancellationToken);
-
+        
+        var result = await userService.GetUserByIdAsync(userId, cancellationToken);
+        
         await result.Match(
             success => SendAsync(success.ToModel(), StatusCodes.Status200OK, cancellation: cancellationToken),
             error => error switch
@@ -45,13 +45,13 @@ internal class GetRoleById(IRoleService roleService) : EndpointWithoutRequest
                 EntityNotFoundException => SendAsync(new ProblemDetails
                 {
                     Status = StatusCodes.Status404NotFound,
-                    Detail = $"Role with ID {roleId} not found.",
+                    Detail = $"User with ID {userId} not found.",
                     TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
                 }, StatusCodes.Status404NotFound, cancellation: cancellationToken),
                 _ => SendAsync(new ProblemDetails
                 {
                     Status = StatusCodes.Status500InternalServerError,
-                    Detail = $"An unexpected error occurred while retrieving the role. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
+                    Detail = $"An unexpected error occurred while retrieving the user. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
                     TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
                 }, StatusCodes.Status500InternalServerError, cancellation: cancellationToken)
             }

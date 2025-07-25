@@ -15,6 +15,8 @@ internal interface IUserService
 {
     Task<Result<User>> AddUserAsync(UserModel model, CancellationToken cancellationToken = default);
     Task<Result<User>> UpdateUserAsync(UserModel user, CancellationToken cancellationToken = default);
+    Task<Result<User>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<Result<User>> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<List<User>> GetUsersAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken);
 }
 
@@ -186,6 +188,48 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             logger.LogError(ex, "Failed to update user {UserId}", user.Id);
             throw;
         }
+    }
+
+    public async Task<Result<User>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("UserService.GetUserByIdAsync");
+        
+        if (userId == Guid.Empty)
+        {
+            logger.LogWarning("Attempted to get user with empty ID.");
+            return new Result<User>(new ArgumentException("User ID cannot be empty.", nameof(userId)));
+        }
+        
+        var user = await repository.GetByIdAsync(userId, noTracking: true, cancellationToken);
+
+        if (user is null)
+        {
+            logger.LogWarning("User with ID {UserId} not found.", userId);
+            return new Result<User>(new EntityNotFoundException("User", userId));
+        }
+        
+        return new Result<User>(user);
+    }
+
+    public async Task<Result<User>> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("UserService.GetUserByEmailAsync");
+        
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            logger.LogWarning("Attempted to get user with empty email.");
+            return new Result<User>(new ArgumentException("Email cannot be empty.", nameof(email)));
+        }
+        
+        var user = await repository.GetByEmailAsync(email, noTracking: true, cancellationToken);
+
+        if (user is null)
+        {
+            logger.LogWarning("User with email {Email} not found.", email);
+            return new Result<User>(new EntityNotFoundException("User", email));
+        }
+        
+        return new Result<User>(user);
     }
 
     public async Task<List<User>> GetUsersAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)

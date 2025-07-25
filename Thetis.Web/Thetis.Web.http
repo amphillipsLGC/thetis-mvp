@@ -74,7 +74,7 @@ Accept: application/json
 }
 
 ### Update an existing user
-@User_Id = 01983c11-035e-7e8c-9c65-98150b86616e
+@User_Id = 019836d6-c3af-78eb-83b4-fb6637eee9f3
 PUT {{Thetis_HostAddress}}/users/{{User_Id}}
 Content-Type: application/json
 Accept: application/json
@@ -93,6 +93,14 @@ Accept: application/json
     }
   ]
 }
+
+### Get user by ID
+GET {{Thetis_HostAddress}}/users/{{User_Id}}
+Accept: application/json
+
+### Delete a user
+DELETE {{Thetis_HostAddress}}/users/{{User_Id}}
+Accept: application/json
 
 ### Get all users
 
