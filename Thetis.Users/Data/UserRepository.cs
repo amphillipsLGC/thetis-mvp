@@ -5,6 +5,7 @@ namespace Thetis.Users.Data;
 
 internal interface IUserRepository
 {
+    UserDbContext DbContext { get; }
     Task<User?> GetByIdAsync(Guid userId, bool noTracking, CancellationToken cancellationToken);
     Task<User?> GetByUsernameAsync(string username, bool noTracking, CancellationToken cancellationToken);
     Task<User?> GetByEmailAsync(string email, bool noTracking, CancellationToken cancellationToken);
@@ -17,6 +18,8 @@ internal interface IUserRepository
 
 internal class UserRepository(UserDbContext dbContext): IUserRepository
 {
+    public UserDbContext DbContext => dbContext;
+    
     public async Task<User?> GetByIdAsync(Guid userId, bool noTracking = false,  CancellationToken cancellationToken = default)
     {
         var query = noTracking

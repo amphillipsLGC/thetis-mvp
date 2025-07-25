@@ -3,6 +3,7 @@ using System.Text.Json;
 using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
 using Thetis.Common.Exceptions;
+using Thetis.Common.SerDes;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Data;
 using Thetis.Users.Domain;
@@ -42,7 +43,7 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             }
             
             // Set claims if any provided
-            if (model.Claims is not null)
+            if (model.Claims is not null && model.Claims.Count > 0)
             {
                 role.Claims = model.Claims.Select(c => new RoleClaim
                 {
@@ -60,10 +61,7 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
         }
         catch (Exception ex)
         {
-            Activity.Current?.AddTag("Role", JsonSerializer.Serialize(role, new JsonSerializerOptions
-            {
-                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
-            }));
+            Activity.Current?.AddTag("role", JsonSerializer.Serialize(role, ThetisSerializerOptions.PreserveReferenceHandler));
             Activity.Current?.AddTag("exception", ex.Message);
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
@@ -76,21 +74,19 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
     {
         using var activity = Activity.Current?.Source.StartActivity("Users.RoleService.UpdateRoleAsync");
         
-        var entity = role.ToEntity();
-        
-        if (entity.Id == Guid.Empty)
+        if (role.Id == Guid.Empty)
         {
             return new Result<Role>(new ArgumentException("Role ID cannot be empty.", nameof(role)));
         }
-
+        
         try
         {
-            var existingRole = await repository.GetByIdAsync(entity.Id, noTracking: false, cancellationToken);
+            var existingRole = await repository.GetByIdAsync(role.Id, noTracking: false, cancellationToken);
             
             if (existingRole is null)
             {
-                logger.LogWarning("Role with ID {RoleId} not found.", entity.Id);
-                return new Result<Role>(new EntityNotFoundException("Role", entity.Id));
+                logger.LogWarning("Role with ID {RoleId} not found.", role.Id);
+                return new Result<Role>(new EntityNotFoundException("Role", role.Id));
             }
             
             // Update existing role with the new values
@@ -146,20 +142,17 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             //await repository.Update(existingRole);
             await repository.SaveChangesAsync(cancellationToken);
             
-            logger.LogInformation("Role {RoleId} updated successfully.", entity.Id);
+            logger.LogInformation("Role {RoleId} updated successfully.", existingRole.Id);
             
             return new Result<Role>(existingRole);
         }
         catch (Exception ex)
         {
-            Activity.Current?.AddTag("Role", JsonSerializer.Serialize(entity, new JsonSerializerOptions
-            {
-                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
-            }));
+            Activity.Current?.AddTag("role", JsonSerializer.Serialize(role, ThetisSerializerOptions.PreserveReferenceHandler));
             Activity.Current?.AddTag("exception", ex.Message);
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
-            logger.LogError(ex, "Failed to update role {RoleName}.", entity.Name);
+            logger.LogError(ex, "Failed to update role {RoleName}.", role.Name);
             throw;
         }
     }
@@ -192,7 +185,7 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
         }
         catch (Exception ex)
         {
-            Activity.Current?.AddTag("RoleId", roleId.ToString());
+            Activity.Current?.AddTag("role.id", roleId.ToString());
             Activity.Current?.AddTag("exception", ex.Message);
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
@@ -254,8 +247,20 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
             logger.LogWarning("Invalid pagination parameters: pageNumber={PageNumber}, pageSize={PageSize}", pageNumber, pageSize);
             throw new ArgumentException("Page number and page size must be greater than zero.", nameof(pageNumber));
         }
-        
-        var roles = await repository.ListAsync(sortBy, pageNumber, pageSize, cancellationToken);
-        return roles;
+
+        try
+        {
+            var roles = await repository.ListAsync(sortBy, pageNumber, pageSize, cancellationToken);
+            return roles;
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("search.filters", JsonSerializer.Serialize(new { sortBy, pageNumber, pageSize }, ThetisSerializerOptions.PreserveReferenceHandler));
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to retrieve users with sortBy={SortBy}, pageNumber={PageNumber}, pageSize={PageSize}", sortBy, pageNumber, pageSize);
+            throw;
+        }
     }
 }

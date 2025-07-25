@@ -73,6 +73,27 @@ Accept: application/json
     "email": "jonh.doe@example.com"
 }
 
+### Update an existing user
+@User_Id = 01983c11-035e-7e8c-9c65-98150b86616e
+PUT {{Thetis_HostAddress}}/users/{{User_Id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "019836d6-c3af-78eb-83b4-fb6637eee9f3",
+  "firstName": "John",
+  "lastName": "Doe",
+  "username": "John.Doe",
+  "email": "john.doe@example.com",
+  "emailVerified": false,
+  "roles": [
+    {
+      "id": "01983738-b39d-760a-bcf0-95dc6c6c2184",
+      "name": "Administrator"      
+    }
+  ]
+}
+
 ### Get all users
 
 @UserPageNumber = 1
