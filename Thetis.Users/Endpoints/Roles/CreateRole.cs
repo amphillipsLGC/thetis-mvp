@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Thetis.Authorization;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
 using Thetis.Users.Domain;
@@ -17,9 +18,11 @@ internal class CreateRole(IRoleService roleService) : Endpoint<RoleModel>
             .WithName("Create a new role")
             .Produces<RoleModel>(201)
             .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(409)
             .ProducesProblem(500));
-        AllowAnonymous();
+        Policies(nameof(PolicyNames.SystemAdministrator));
     }
 
     public override async Task HandleAsync(RoleModel request, CancellationToken cancellationToken)
@@ -39,7 +42,7 @@ internal class CreateRole(IRoleService roleService) : Endpoint<RoleModel>
                 ),
                 _ => SendAsync(new ProblemDetails
                     {
-                        Status = StatusCodes.Status400BadRequest,
+                        Status = StatusCodes.Status500InternalServerError,
                         Detail =
                             $"An unexpected error occurred while creating the role. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
                         TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,

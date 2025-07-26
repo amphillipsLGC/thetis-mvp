@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Thetis.Authorization;
 using Thetis.Common.Exceptions;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
@@ -18,9 +19,12 @@ internal class UpdateUser(IUserService userService) : Endpoint<UserModel>
             .WithName("Update an existing user")
             .Produces<UserModel>(200)
             .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(404)
+            .ProducesProblem(409)
             .ProducesProblem(500));
-        AllowAnonymous();
+        Policies(nameof(PolicyNames.SystemAdministrator));
     }
 
     public override async Task HandleAsync(UserModel request, CancellationToken cancellationToken)
@@ -77,7 +81,7 @@ internal class UpdateUser(IUserService userService) : Endpoint<UserModel>
                 }, StatusCodes.Status409Conflict, cancellation: cancellationToken),
                 _ => SendAsync(new ProblemDetails
                 {
-                    Status = StatusCodes.Status400BadRequest,
+                    Status = StatusCodes.Status500InternalServerError,
                     Detail = $"An unexpected error occurred while updating the user. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
                     TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,
                 }, StatusCodes.Status400BadRequest, cancellation: cancellationToken)

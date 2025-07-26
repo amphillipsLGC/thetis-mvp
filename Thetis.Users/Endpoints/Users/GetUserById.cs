@@ -17,6 +17,9 @@ internal class GetUserById(IUserService userService) : EndpointWithoutRequest
         Description(x => x
             .WithName("Get user by ID")
             .Produces<UserModel>(200)
+            .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(404)
             .ProducesProblem(500));
         Policies(nameof(PolicyNames.SystemAdministrator));

@@ -21,6 +21,7 @@ internal class ListUsers(IUserService userService) : EndpointWithoutRequest<List
             .WithName("List all users")
             .Produces<ListUsersResponse>(200)
             .ProducesProblem(400)
+            .ProducesProblem(401)
             .ProducesProblem(403)
             .ProducesProblem(404)
             .ProducesProblem(500));

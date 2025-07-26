@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Common", "Thetis.Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Authorization", "Thetis.Authorization\Thetis.Authorization.csproj", "{182BD1B8-C3D0-48D9-BB9C-9F4DE2F3CA64}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thetis.Mediation", "Thetis.Mediation\Thetis.Mediation.csproj", "{BA414633-27B7-41EB-B242-6290B18446A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +45,9 @@ Global
 		{182BD1B8-C3D0-48D9-BB9C-9F4DE2F3CA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{182BD1B8-C3D0-48D9-BB9C-9F4DE2F3CA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{182BD1B8-C3D0-48D9-BB9C-9F4DE2F3CA64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA414633-27B7-41EB-B242-6290B18446A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA414633-27B7-41EB-B242-6290B18446A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA414633-27B7-41EB-B242-6290B18446A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA414633-27B7-41EB-B242-6290B18446A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

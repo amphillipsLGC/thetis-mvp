@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Thetis.Authorization;
 using Thetis.Common.Exceptions;
 using Thetis.Users.Application.Services;
 
@@ -19,9 +20,11 @@ internal class DeleteRole(IRoleService roleService) : EndpointWithoutRequest
             .WithName("Delete a role")
             .Produces<NoContent>(204)
             .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(404)
             .ProducesProblem(500));
-        AllowAnonymous();
+        Policies(nameof(PolicyNames.SystemAdministrator));
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

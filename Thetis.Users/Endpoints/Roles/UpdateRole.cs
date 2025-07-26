@@ -18,7 +18,10 @@ internal class UpdateRole(IRoleService roleService) : Endpoint<RoleModel>
             .WithName("Update an existing role")
             .Produces<RoleModel>(200)
             .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(404)
+            .ProducesProblem(409)
             .ProducesProblem(500));
         AllowAnonymous();
     }
@@ -73,7 +76,7 @@ internal class UpdateRole(IRoleService roleService) : Endpoint<RoleModel>
                 ),
                 _ => SendAsync(new ProblemDetails
                     {
-                        Status = StatusCodes.Status400BadRequest,
+                        Status = StatusCodes.Status500InternalServerError,
                         Detail =
                             $"An unexpected error occurred while updating the role. See trace ID: {Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier} for more details.",
                         TraceId = Activity.Current?.TraceId.ToString() ?? HttpContext.TraceIdentifier,

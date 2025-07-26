@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Thetis.Authorization;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
 
@@ -20,8 +21,10 @@ internal class ListRoles(IRoleService roleService) : EndpointWithoutRequest<List
             .WithName("List all roles")
             .Produces<ListRolesResponse>(200)
             .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(500));
-        AllowAnonymous();
+        Policies(nameof(PolicyNames.SystemAdministrator));
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)
