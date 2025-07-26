@@ -35,7 +35,7 @@ internal static class UserExtensions
             user.Username,
             user.Email,
             user.EmailVerified,
-            user.Roles.Select(r => new UserRoleModel(r.RoleId, r.Role.Name)).ToList()
+            user.Roles.Select(r => new UserRoleModel(r.Id, r.Name)).ToList()
         );
     }
     

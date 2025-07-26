@@ -37,25 +37,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(512);
 
         builder.HasMany(u => u.Roles)
-            .WithOne(r =>   r.User)
-            .HasForeignKey(k => k.UserId);
-    }
-}
-
-internal class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
-{
-    public void Configure(EntityTypeBuilder<UserRole> builder)
-    {
-        builder.ToTable("UserRoles");
-
-        builder.HasKey(ur => new { ur.UserId, ur.RoleId });
-
-        builder.HasOne(ur => ur.User)
-            .WithMany(u => u.Roles)
-            .HasForeignKey(ur => ur.UserId);
-
-        builder.HasOne(ur => ur.Role)
-            .WithMany(r => r.Users)
-            .HasForeignKey(ur => ur.RoleId);
+            .WithMany(r => r.Users);
     }
 }

@@ -12,7 +12,7 @@ using Thetis.Users.Data;
 namespace Thetis.Users.Data.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250723103045_Initial")]
+    [Migration("20250726103108_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,6 +25,21 @@ namespace Thetis.Users.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<Guid>("RolesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RoleUser", "User");
+                });
 
             modelBuilder.Entity("Thetis.Users.Domain.Role", b =>
                 {
@@ -131,19 +146,19 @@ namespace Thetis.Users.Data.Migrations
                     b.ToTable("Users", "User");
                 });
 
-            modelBuilder.Entity("Thetis.Users.Domain.UserRole", b =>
+            modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.HasOne("Thetis.Users.Domain.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("UserRoles", "User");
+                    b.HasOne("Thetis.Users.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Thetis.Users.Domain.RoleClaim", b =>
@@ -157,35 +172,9 @@ namespace Thetis.Users.Data.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Thetis.Users.Domain.UserRole", b =>
-                {
-                    b.HasOne("Thetis.Users.Domain.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Thetis.Users.Domain.User", "User")
-                        .WithMany("Roles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Thetis.Users.Domain.Role", b =>
                 {
                     b.Navigation("Claims");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Thetis.Users.Domain.User", b =>
-                {
-                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }

@@ -19,4 +19,8 @@
       <ProjectReference Include="..\Thetis.Common\Thetis.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Data\Migrations\" />
+    </ItemGroup>
+
 </Project>

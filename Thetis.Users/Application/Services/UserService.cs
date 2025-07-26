@@ -71,7 +71,7 @@ internal class UserService(ILogger<UserService> logger, PasswordHasher hasher, I
                         continue;
                     }
                     
-                    user.Roles.Add(new UserRole { Role = roleEntity });
+                    user.Roles.Add(roleEntity);
                 }
             }
             
@@ -154,14 +154,14 @@ internal class UserService(ILogger<UserService> logger, PasswordHasher hasher, I
             
             // Update roles if any selected
             var rolesToRemove = existingUser.Roles
-                .Where(r => user.Roles?.All(ur => ur.Id != r.RoleId) ?? true)
+                .Where(r => user.Roles is null || user.Roles.All(ur => ur.Id != r.Id))
                 .ToList();
             
             if (user.Roles is not null)
             {
                 foreach (var role in user.Roles)
                 {
-                    if (existingUser.Roles.Any(r => r.RoleId == role.Id))
+                    if (existingUser.Roles.Any(r => r.Id == role.Id))
                         continue;
                     
                     var roleEntity = await roleRepository.GetByIdAsync(role.Id, noTracking: true, cancellationToken);
@@ -171,7 +171,7 @@ internal class UserService(ILogger<UserService> logger, PasswordHasher hasher, I
                         continue;
                     }
                     
-                    existingUser.Roles.Add(new UserRole { Role = roleEntity });
+                    existingUser.Roles.Add(roleEntity);
                 }
             }
             

@@ -17,8 +17,7 @@ internal class User
     public DateTimeOffset? UpdatedOn { get; set; }
     public DateTimeOffset? LastLogin { get; set; }
     public bool IsDeleted { get; set; }
-
-    public virtual ICollection<UserRole> Roles { get; set; } = [];
+    public List<Role> Roles { get; set; } = [];
 }
 
 internal class Role
@@ -26,18 +25,8 @@ internal class Role
     public Guid Id { get; set; } = Guid.CreateVersion7();
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    
-    public virtual ICollection<UserRole> Users { get; set; } = [];
-    public virtual ICollection<RoleClaim> Claims { get; set; } = [];
-}
-
-internal class UserRole
-{
-    public Guid UserId { get; set; }
-    public Guid RoleId { get; set; }
-    
-    public virtual User User { get; set; } = null!;
-    public virtual Role Role { get; set; } = null!;
+    public List<User> Users { get; set; } = [];
+    public List<RoleClaim> Claims { get; set; } = [];
 }
 
 internal class RoleClaim

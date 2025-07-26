@@ -1,3 +1,4 @@
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using Thetis.Users.Domain;
 
@@ -23,12 +24,36 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
     public async Task<User?> GetByIdAsync(Guid userId, bool noTracking = false,  CancellationToken cancellationToken = default)
     {
         var query = noTracking
-            ? dbContext.Users.Include(i => i.Roles).AsNoTracking()
-            : dbContext.Users.Include(i => i.Roles);
+            ? dbContext.Users.AsNoTracking()
+            : dbContext.Users;
         
-        return await query
-            
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await query
+            .Include(i => i.Roles)
+            .Where(u => u.Id == userId)
+            .Select(u =>  new User
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Username = u.Username,
+                Email = u.Email,
+                EmailVerified = u.EmailVerified,
+                PasswordHash = u.PasswordHash,
+                CreatedOn = u.CreatedOn,
+                UpdatedOn = u.UpdatedOn,
+                LastLogin = u.LastLogin,
+                IsDeleted = u.IsDeleted,
+                Roles = u.Roles.Select(r => new Role
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Description = r.Description,
+                    Claims = r.Claims
+                }).ToList()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        return user;
     }
 
     public Task<User?> GetByUsernameAsync(string username, bool noTracking = false, CancellationToken cancellationToken = default)
@@ -37,9 +62,33 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
             ? dbContext.Users.AsNoTracking()
             : dbContext.Users;
 
-        return query
+        var user = query
             .Include(i => i.Roles)
-            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+            .Where(u => u.Username == username)
+            .Select(u =>  new User
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Username = u.Username,
+                Email = u.Email,
+                EmailVerified = u.EmailVerified,
+                PasswordHash = u.PasswordHash,
+                CreatedOn = u.CreatedOn,
+                UpdatedOn = u.UpdatedOn,
+                LastLogin = u.LastLogin,
+                IsDeleted = u.IsDeleted,
+                Roles = u.Roles.Select(r => new Role
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Description = r.Description,
+                    Claims = r.Claims
+                }).ToList()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        return user;
     }
 
     public async Task<User?> GetByEmailAsync(string email, bool noTracking = false, CancellationToken cancellationToken = default)
@@ -48,9 +97,33 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
             ? dbContext.Users.AsNoTracking()
             : dbContext.Users;
 
-        return await query
+        var user = await query
             .Include(i => i.Roles)
-            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+            .Where(u => u.Email == email)
+            .Select(u =>  new User
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Username = u.Username,
+                Email = u.Email,
+                EmailVerified = u.EmailVerified,
+                PasswordHash = u.PasswordHash,
+                CreatedOn = u.CreatedOn,
+                UpdatedOn = u.UpdatedOn,
+                LastLogin = u.LastLogin,
+                IsDeleted = u.IsDeleted,
+                Roles = u.Roles.Select(r => new Role
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Description = r.Description,
+                    Claims = r.Claims
+                }).ToList()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return user;
     }
 
     public async Task<List<User>> ListAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken)
@@ -74,6 +147,27 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
         // Apply pagination
         var list = await query.Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
+                    .Select(u =>  new User
+                    {
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        Username = u.Username,
+                        Email = u.Email,
+                        EmailVerified = u.EmailVerified,
+                        PasswordHash = u.PasswordHash,
+                        CreatedOn = u.CreatedOn,
+                        UpdatedOn = u.UpdatedOn,
+                        LastLogin = u.LastLogin,
+                        IsDeleted = u.IsDeleted,
+                        Roles = u.Roles.Select(r => new Role
+                        {
+                            Id = r.Id,
+                            Name = r.Name,
+                            Description = r.Description,
+                            Claims = r.Claims
+                        }).ToList()
+                    })
                     .ToListAsync(cancellationToken);
 
         return list;

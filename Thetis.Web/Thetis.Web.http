@@ -7,8 +7,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "Administrator2",
-  "description": "Administrator2 role with full access",
+  "name": "Administrator",
+  "description": "Administrator role with full access",
   "claims": [
     {
       "claimType": "Permission",
@@ -22,7 +22,7 @@ Accept: application/json
 }
 
 ### Update an existing role
-@Role_Id = 01983c11-035e-7e8c-9c65-98150b86616e
+@Role_Id = 0198464d-09f8-786e-91cd-abd2c3fce3bb
 PUT {{Thetis_HostAddress}}/api/roles/{{Role_Id}}
 Content-Type: application/json
 Accept: application/json
@@ -86,7 +86,7 @@ Accept: application/json
 }
 
 ### Update an existing user
-@User_Id = 0198446b-c172-72f7-9b83-ecb599ee65ec
+@User_Id = 0198464b-f299-7a51-b0d8-d61bca4157bd
 PUT {{Thetis_HostAddress}}/api/users/{{User_Id}}
 Content-Type: application/json
 Accept: application/json
@@ -97,10 +97,10 @@ Accept: application/json
   "lastName": "McTestFace",
   "username": "Test.McTestFace",
   "password": "TestPassword123!",
-  "email": "jonh.doe@example.com",
+  "email": "Test.McTestFace@example.com",
   "roles": [
     {
-      "id": "01983738-b39d-760a-bcf0-95dc6c6c2184",
+      "id": "0198464d-09f8-786e-91cd-abd2c3fce3bb",
       "name": "Administrator"      
     }
   ]

@@ -48,9 +48,11 @@ internal class Login(IUserService userService) : Endpoint<LoginRequest>
                     new Claim(SystemClaims.Subject, authenticatedUser.Id.ToString())
                 };
                 
+                //TODO FIx this to include the claims in the roles, need to add the claims to the user model
                 if(authenticatedUser.Roles is not null && authenticatedUser.Roles.Count > 0)
                 {
                     claims.AddRange(authenticatedUser.Roles.Select(role => new Claim(SystemClaims.Roles, role.Name)));
+                    
                 }
                 
                 var identity = new ClaimsIdentity(claims, ThetisAuthenticationSchemes.Cookie);
