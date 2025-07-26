@@ -19,6 +19,14 @@ export class LoginComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
+  ngOnInit() {
+    this.auth.getUserDetails().subscribe(userSuccess => {
+      if (userSuccess) {
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
+
   onSubmit() {
     this.auth.login(this.username, this.password).subscribe(success => {
       if (success) {
