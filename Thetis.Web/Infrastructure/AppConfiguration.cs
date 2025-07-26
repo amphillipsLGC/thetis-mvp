@@ -1,10 +1,13 @@
+using System.Reflection;
 using Microsoft.Extensions.FileProviders;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using Thetis.Common;
 
-namespace Thetis.Web;
+namespace Thetis.Web.Infrastructure;
 
 public static class AppConfiguration
 {
@@ -45,6 +48,15 @@ public static class AppConfiguration
             ?? AspireTelemetryEndpointPath;
         
         builder.Services.AddOpenTelemetry()
+            .ConfigureResource(resource =>
+            {
+                resource
+                    //.AddService(ApplicationDiagnostics.ServiceName)
+                    .AddAttributes([
+                        new KeyValuePair<string, object>("service.version",
+                               Assembly.GetExecutingAssembly().GetName().Version!.ToString())
+                    ]);
+            })
             .WithTracing(tracingBuilder =>
             {
                 tracingBuilder
@@ -67,6 +79,7 @@ public static class AppConfiguration
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddRuntimeInstrumentation()
+                    .AddMeter(ApplicationDiagnostics.Meter.Name)
                     .AddOtlpExporter(options =>
                     {
                         options.Endpoint = new Uri(!string.IsNullOrEmpty(otlpEndpoint) ? otlpEndpoint : aspireEndpoint);

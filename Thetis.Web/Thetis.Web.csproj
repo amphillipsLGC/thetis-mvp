@@ -8,6 +8,8 @@
 
     <ItemGroup>
         <PackageReference Include="FastEndpoints" Version="6.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -36,6 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Endpoints\" />
       <Folder Include="wwwroot\" />
     </ItemGroup>
 

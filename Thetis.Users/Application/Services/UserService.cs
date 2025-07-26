@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using LanguageExt.Common;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Thetis.Common.Exceptions;
 using Thetis.Common.SerDes;
@@ -12,17 +13,18 @@ namespace Thetis.Users.Application.Services;
 
 internal interface IUserService
 {
-    Task<Result<User>> AddUserAsync(UserModel model, CancellationToken cancellationToken = default);
+    Task<Result<User>> CreateUserAsync(CreateUserModel model, CancellationToken cancellationToken = default);
     Task<Result<User>> UpdateUserAsync(UserModel user, CancellationToken cancellationToken = default);
     Task<Result<bool>> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Result<User>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Result<User>> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<List<User>> GetUsersAsync(string sortBy, int pageNumber, int pageSize, CancellationToken cancellationToken);
+    Task<Result<User>> AuthenticateUserAsync(string username, string password, CancellationToken cancellationToken = default);
 }
 
-internal class UserService(ILogger<UserService> logger, IUserRepository repository, IRoleRepository roleRepository) : IUserService
+internal class UserService(ILogger<UserService> logger, PasswordHasher hasher, IUserRepository repository, IRoleRepository roleRepository) : IUserService
 {
-    public async Task<Result<User>> AddUserAsync(UserModel model, CancellationToken cancellationToken = default)
+    public async Task<Result<User>> CreateUserAsync(CreateUserModel model, CancellationToken cancellationToken = default)
     {
         using var activity = Activity.Current?.Source.StartActivity("UserService.AddUserAsync");
         
@@ -48,17 +50,24 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
                 logger.LogWarning("Email {Email} already exists.", user.Email);
                 return new Result<User>(new EmailAlreadyInUseException(user.Email));
             }
-        
+            
+            // Check if Password is provided
+            if (!string.IsNullOrWhiteSpace(model.Password))
+            {
+                // Hash the password
+                user.PasswordHash = hasher.HashPassword(user, model.Password);
+            }
+
             // Add roles if any selected
             if (model.Roles is not null && model.Roles.Count > 0)
             {
                 foreach (var role in model.Roles)
                 {
-                    var roleEntity = await roleRepository.GetByIdAsync(role.RoleId, noTracking: true, cancellationToken);
+                    var roleEntity = await roleRepository.GetByIdAsync(role.Id, noTracking: true, cancellationToken);
                     
                     if (roleEntity is null)
                     {
-                        logger.LogWarning("Role {RoleId} not found for user {UserId}.", role.RoleId, user.Id);
+                        logger.LogWarning("Role {RoleId} not found for user {UserId}.", role.Id, user.Id);
                         continue;
                     }
                     
@@ -145,20 +154,20 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             
             // Update roles if any selected
             var rolesToRemove = existingUser.Roles
-                .Where(r => user.Roles?.All(ur => ur.RoleId != r.RoleId) ?? true)
+                .Where(r => user.Roles?.All(ur => ur.Id != r.RoleId) ?? true)
                 .ToList();
             
             if (user.Roles is not null)
             {
                 foreach (var role in user.Roles)
                 {
-                    if (existingUser.Roles.Any(r => r.RoleId == role.RoleId))
+                    if (existingUser.Roles.Any(r => r.RoleId == role.Id))
                         continue;
                     
-                    var roleEntity = await roleRepository.GetByIdAsync(role.RoleId, noTracking: true, cancellationToken);
+                    var roleEntity = await roleRepository.GetByIdAsync(role.Id, noTracking: true, cancellationToken);
                     if (roleEntity is null)
                     {
-                        logger.LogWarning("Role {RoleId} not found for user {UserId}.", role.RoleId, user.Id);
+                        logger.LogWarning("Role {RoleId} not found for user {UserId}.", role.Id, user.Id);
                         continue;
                     }
                     
@@ -315,6 +324,54 @@ internal class UserService(ILogger<UserService> logger, IUserRepository reposito
             Activity.Current?.AddTag("stacktrace", ex.StackTrace);
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
             logger.LogError(ex, "Failed to retrieve users with sortBy={SortBy}, pageNumber={PageNumber}, pageSize={PageSize}", sortBy, pageNumber, pageSize);
+            throw;
+        }
+    }
+
+    public async Task<Result<User>> AuthenticateUserAsync(string username, string password, CancellationToken cancellationToken = default)
+    {
+        using var activity = Activity.Current?.Source.StartActivity("UserService.AuthenticateUserAsync");
+        
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            logger.LogWarning("Username or password cannot be empty.");
+            return new Result<User>(new ArgumentException("Username and password cannot be empty."));
+        }
+
+        try
+        {
+            var user = await repository.GetByUsernameAsync(username, noTracking: true, cancellationToken);
+            
+            if (user is null)
+            {
+                logger.LogWarning("User with username {Username} not found.", username);
+                return new Result<User>(new UnauthorizedAccessException("Invalid username or password."));
+            }
+            
+            if(user.PasswordHash is null)
+            {
+                logger.LogWarning("User {Username} does not have a password set.", username);
+                return new Result<User>(new UnauthorizedAccessException("User does not have a password set."));
+            }
+            
+            // Verify the password
+            var verificationResult = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            
+            if (verificationResult != PasswordVerificationResult.Success)
+            {
+                logger.LogWarning("Invalid password for user {Username}.", username);
+                return new Result<User>(new UnauthorizedAccessException("Invalid username or password."));
+            }
+            
+            return new Result<User>(user);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current?.AddTag("username", username);
+            Activity.Current?.AddTag("exception", ex.Message);
+            Activity.Current?.AddTag("stacktrace", ex.StackTrace);
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
+            logger.LogError(ex, "Failed to authenticate user {Username}", username);
             throw;
         }
     }

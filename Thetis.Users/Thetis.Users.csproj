@@ -18,6 +18,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Thetis.Authorization\Thetis.Authorization.csproj" />
     <ProjectReference Include="..\Thetis.Common\Thetis.Common.csproj" />
   </ItemGroup>
   

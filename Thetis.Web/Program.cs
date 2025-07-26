@@ -3,6 +3,7 @@ using Scalar.AspNetCore;
 using Thetis.Profiles.Infrastructure;
 using Thetis.Users.Infrastructure;
 using Thetis.Web;
+using Thetis.Web.Infrastructure;
 using Thetis.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddSerilog();
 
 builder.AddTelemetry();
+
+builder.AddSecurity();
 
 // Add Module Services
 builder.Services.AddUserServices(builder.Configuration);
@@ -33,11 +36,16 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("ExposeO
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
+
+app.UseAuthentication();
 
 // Serve static files from the wwwroot/browser directory
 app.UseBrowserStaticFiles(builder.Environment.ContentRootPath);
 
-app.UseFastEndpoints();
+app.UseFastEndpoints(config =>
+{
+    config.Endpoints.RoutePrefix = "api";
+});
 
 app.Run();

@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Thetis.Authorization;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
 
@@ -20,8 +21,10 @@ internal class ListUsers(IUserService userService) : EndpointWithoutRequest<List
             .WithName("List all users")
             .Produces<ListUsersResponse>(200)
             .ProducesProblem(400)
+            .ProducesProblem(403)
             .ProducesProblem(404)
             .ProducesProblem(500));
+        //Policies(nameof(PolicyNames.SystemAdministrator));
         AllowAnonymous();
     }
 

@@ -1,7 +1,8 @@
 @Thetis_HostAddress = http://localhost:5032
+@AuthCookie = thetis_cookie=CfDJ8P60pvhiA3ZEk1bbt2LaC0BPGnY9x5qQwd-_qeO6aPZLPXDmt2y5vshFctfzX9CgI3blh6NH7KlXXX5eui_9X2v3ZFujkwmPVZZnWSgK3CG-gRD4d0PLQSqGAQ24i5Xm0X690K_2kZM6s0QNwaWODoF9pXMUGZiDvQoXuIPgqil3Ifg2-5cxh9m50N57gwuTLrL-XAzIi7ny6CV1aSoSwUJFuqjVpA_69A4uA635dEqd9wOq6IwOyWbBjLlwRh5RlTglgHStkSQPl2O5IcyZOYTUPidZ3Hy-5QxaI7r8J7dxY-yZ0nK3nwtuT0eK1vNd6V5k8FnyPIFwxfsK_Z7RnsFwZoGVmsDUtai3ZfV--4r4Y5Tu4Szg968D_i7DZwXcC_boTW-voPsMu3oMjNWdE8Fwj4lWcorxWAxPtbMiwcChNAhhLLS1XFPt_6ZLC2rc_tbaq60hKXwaJMNXFzM3I8Y
 
 ### Add a new role
-POST {{Thetis_HostAddress}}/roles
+POST {{Thetis_HostAddress}}/api/roles
 Content-Type: application/json
 Accept: application/json
 
@@ -22,7 +23,7 @@ Accept: application/json
 
 ### Update an existing role
 @Role_Id = 01983c11-035e-7e8c-9c65-98150b86616e
-PUT {{Thetis_HostAddress}}/roles/{{Role_Id}}
+PUT {{Thetis_HostAddress}}/api/roles/{{Role_Id}}
 Content-Type: application/json
 Accept: application/json
 
@@ -47,45 +48,56 @@ Accept: application/json
 }
 
 ### Get role by ID
-GET {{Thetis_HostAddress}}/roles/{{Role_Id}}
+GET {{Thetis_HostAddress}}/api/roles/{{Role_Id}}
 Accept: application/json
 
 ### Delete a role
-DELETE {{Thetis_HostAddress}}/roles/{{Role_Id}}
+DELETE {{Thetis_HostAddress}}/api/roles/{{Role_Id}}
 Accept: application/json
 
 ### Get all roles
 @RolePageNumber = 1
 @RolePageSize = 10
-GET {{Thetis_HostAddress}}/roles?pageNumber={{RolePageNumber}}&pageSize={{RolePageSize}}
+GET {{Thetis_HostAddress}}/api/roles?pageNumber={{RolePageNumber}}&pageSize={{RolePageSize}}
 Accept: application/json
 
 
 ### Add a new user
-POST {{Thetis_HostAddress}}/users
+POST {{Thetis_HostAddress}}/api/users
 Content-Type: application/json
 Accept: application/json
 
 {
-    "firstName": "John",
-    "lastName": "Doe",
-    "username": "John.Doe",
+    "firstName": "Test",
+    "lastName": "McTestFace",
+    "username": "Test.McTestFace",
+    "password": "TestPassword123!",
     "email": "jonh.doe@example.com"
 }
 
-### Update an existing user
-@User_Id = 019836d6-c3af-78eb-83b4-fb6637eee9f3
-PUT {{Thetis_HostAddress}}/users/{{User_Id}}
+### Login with user
+POST {{Thetis_HostAddress}}/api/login
 Content-Type: application/json
 Accept: application/json
 
 {
-  "id": "019836d6-c3af-78eb-83b4-fb6637eee9f3",
-  "firstName": "John",
-  "lastName": "Doe",
-  "username": "John.Doe",
-  "email": "john.doe@example.com",
-  "emailVerified": false,
+  "username": "Test.McTestFace",
+  "password": "TestPassword123!"
+}
+
+### Update an existing user
+@User_Id = 0198446b-c172-72f7-9b83-ecb599ee65ec
+PUT {{Thetis_HostAddress}}/api/users/{{User_Id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "{{User_Id}}",
+  "firstName": "Test",
+  "lastName": "McTestFace",
+  "username": "Test.McTestFace",
+  "password": "TestPassword123!",
+  "email": "jonh.doe@example.com",
   "roles": [
     {
       "id": "01983738-b39d-760a-bcf0-95dc6c6c2184",
@@ -95,29 +107,30 @@ Accept: application/json
 }
 
 ### Get user by ID
-GET {{Thetis_HostAddress}}/users/{{User_Id}}
+GET {{Thetis_HostAddress}}/api/users/{{User_Id}}
 Accept: application/json
 
 ### Delete a user
-DELETE {{Thetis_HostAddress}}/users/{{User_Id}}
+DELETE {{Thetis_HostAddress}}/api/users/{{User_Id}}
 Accept: application/json
 
 ### Get all users
 
 @UserPageNumber = 1
 @UserPageSize = 10
-GET {{Thetis_HostAddress}}/users?pageNumber={{UserPageNumber}}&pageSize={{UserPageSize}}
+GET {{Thetis_HostAddress}}/api/users?pageNumber={{UserPageNumber}}&pageSize={{UserPageSize}}
 Accept: application/json
+Cookie: {{AuthCookie}}
 
 ### Get profile by ID
 
 @Profile_Id = 12345
-GET {{Thetis_HostAddress}}/profiles/{{Profile_Id}}
+GET {{Thetis_HostAddress}}/api/profiles/{{Profile_Id}}
 Accept: application/json
 
 ### Get all profiles
 
 @ProfilePageNumber = 1
 @ProfilePageSize = 10
-GET {{Thetis_HostAddress}}/profiles?pageNumber={{ProfilePageNumber}}&pageSize={{ProfilePageSize}}
+GET {{Thetis_HostAddress}}/api/profiles?pageNumber={{ProfilePageNumber}}&pageSize={{ProfilePageSize}}
 ASccept: application/json

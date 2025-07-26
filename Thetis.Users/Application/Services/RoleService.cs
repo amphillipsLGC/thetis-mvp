@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
+using Thetis.Authorization;
 using Thetis.Common.Exceptions;
 using Thetis.Common.SerDes;
 using Thetis.Users.Application.Models;
@@ -48,7 +49,7 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
                 role.Claims = model.Claims.Select(c => new RoleClaim
                 {
                     Id = Guid.CreateVersion7(),
-                    ClaimType = c.ClaimType,
+                    ClaimType = SystemClaims.Permission,
                     ClaimValue = c.ClaimValue
                 }).ToList();
             }
@@ -115,7 +116,7 @@ internal class RoleService(ILogger<RoleService> logger, IRoleRepository reposito
                         var newClaim = new RoleClaim
                         {
                             Id = Guid.CreateVersion7(),
-                            ClaimType = claim.ClaimType,
+                            ClaimType = SystemClaims.Permission,
                             ClaimValue = claim.ClaimValue,
                             RoleId = existingRole.Id
                         };

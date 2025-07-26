@@ -23,11 +23,11 @@ internal class UserRepository(UserDbContext dbContext): IUserRepository
     public async Task<User?> GetByIdAsync(Guid userId, bool noTracking = false,  CancellationToken cancellationToken = default)
     {
         var query = noTracking
-            ? dbContext.Users.AsNoTracking()
-            : dbContext.Users;
+            ? dbContext.Users.Include(i => i.Roles).AsNoTracking()
+            : dbContext.Users.Include(i => i.Roles);
         
         return await query
-            .Include(i => i.Roles)
+            
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 

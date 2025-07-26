@@ -8,7 +8,7 @@ using Thetis.Users.Domain;
 
 namespace Thetis.Users.Endpoints.Users;
 
-internal class CreateUser(IUserService userService) : Endpoint<UserModel>
+internal class CreateUser(IUserService userService) : Endpoint<CreateUserModel>
 {
     public override void Configure()
     {
@@ -21,9 +21,9 @@ internal class CreateUser(IUserService userService) : Endpoint<UserModel>
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(UserModel request, CancellationToken cancellationToken)
+    public override async Task HandleAsync(CreateUserModel request, CancellationToken cancellationToken)
     {
-        var result = await userService.AddUserAsync(request, cancellationToken);
+        var result = await userService.CreateUserAsync(request, cancellationToken);
 
         await result.Match(
             success => 

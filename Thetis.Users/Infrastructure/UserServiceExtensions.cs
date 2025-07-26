@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Thetis.Users.Application.Services;
 using Thetis.Users.Data;
+using Thetis.Users.Domain;
 
 namespace Thetis.Users.Infrastructure;
 
@@ -24,6 +26,8 @@ public static class UserServiceExtensions
                 npgsqlOptions.CommandTimeout(30);
             });
         });
+        
+        services.AddSingleton<PasswordHasher>();
         
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserService, UserService>();
