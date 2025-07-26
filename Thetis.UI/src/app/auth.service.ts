@@ -30,8 +30,18 @@ export class AuthService {
     );
   }
 
-  logout(): void {
-    this.loggedIn = false;
+  logout(): Observable<boolean> {
+    return this.http.post('/api/logout', {}).pipe(
+      map(() => {
+        this.loggedIn = false;
+        this.user = null;
+        return true;
+      }),
+      catchError(() => {
+        console.error('Logout failed');
+        return of(false);
+      })
+    );   
   }
 
   isLoggedIn(): boolean {

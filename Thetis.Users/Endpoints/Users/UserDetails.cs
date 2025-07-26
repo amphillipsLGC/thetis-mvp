@@ -20,7 +20,7 @@ internal class UserDetails(IHttpContextAccessor httpContextAccessor) : EndpointW
             .ProducesProblem(401)
             .ProducesProblem(403)
             .ProducesProblem(500));
-        Policies(nameof(PolicyNames.SystemAdministrator));
+        Policies(nameof(PolicyNames.AuthenticatedUser));
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

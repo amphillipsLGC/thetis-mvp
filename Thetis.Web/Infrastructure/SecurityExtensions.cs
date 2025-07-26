@@ -186,6 +186,8 @@ public static class SecurityExtensions
         }
         
         builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(nameof(PolicyNames.AuthenticatedUser), AuthorizationPolicies.AuthenticatedUser()
+                .AddAuthenticationSchemes([..validAuthSchemes]).Build())
             .AddPolicy(nameof(PolicyNames.ProfileCreator), AuthorizationPolicies.AllowedToCreateProfiles()
                 .AddAuthenticationSchemes([..validAuthSchemes]).Build())
             .AddPolicy(nameof(PolicyNames.TestDataPublisher), AuthorizationPolicies.AllowedToPublishToFhirServer()

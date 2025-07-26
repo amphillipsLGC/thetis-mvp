@@ -4,6 +4,12 @@ namespace Thetis.Authorization;
 
 public static class AuthorizationPolicies
 {
+    public static AuthorizationPolicyBuilder AuthenticatedUser()
+    {
+        return new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser();
+    }
+    
     public static AuthorizationPolicyBuilder AllowedToCreateProfiles()
     {
         return new AuthorizationPolicyBuilder()
@@ -28,6 +34,7 @@ public static class AuthorizationPolicies
 
 public enum PolicyNames
 {
+    AuthenticatedUser,
     ProfileCreator,
     TestDataPublisher,
     SystemAdministrator

@@ -1,1 +1,21 @@
+<header class="flex items-center justify-between px-6 py-3 bg-white shadow">
+  <div class="flex items-center gap-2">
+    <svg class="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" />
+      <text x="12" y="16" text-anchor="middle" font-size="10" fill="white">T</text>
+    </svg>
+    <span class="text-xl font-bold text-gray-800">Thetis UI</span>
+  </div>
+  <div class="relative" ng-controller="HeaderController as header">
+    <button class="flex items-center gap-2 focus:outline-none" (click)="showMenu = !showMenu">
+      <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4" />
+        <path d="M6 20c0-2.2 2.7-4 6-4s6 1.8 6 4" />
+      </svg>
+    </button>
+    <div *ngIf="showMenu" class="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
+      <button class="w-full text-left px-4 py-2 hover:bg-gray-100" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</header>
 <router-outlet />
