@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Thetis.Authorization;
 using Thetis.Common.Exceptions;
 using Thetis.Users.Application.Models;
 using Thetis.Users.Application.Services;
@@ -18,7 +19,7 @@ internal class GetUserById(IUserService userService) : EndpointWithoutRequest
             .Produces<UserModel>(200)
             .ProducesProblem(404)
             .ProducesProblem(500));
-        AllowAnonymous();
+        Policies(nameof(PolicyNames.SystemAdministrator));
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

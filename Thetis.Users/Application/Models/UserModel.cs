@@ -22,7 +22,8 @@ internal record UserModel(
     List<UserRoleModel>? Roles
 );
 
-internal record UserRoleModel(Guid Id, string Name);
+internal record UserRoleModel(Guid Id, string Name, List<UserClaimModel> Claims);
+internal record UserClaimModel(string ClaimType, string ClaimValue);
 
 internal static class UserExtensions
 {
@@ -35,7 +36,11 @@ internal static class UserExtensions
             user.Username,
             user.Email,
             user.EmailVerified,
-            user.Roles.Select(r => new UserRoleModel(r.Id, r.Name)).ToList()
+            user.Roles.Select(r => new UserRoleModel(
+                r.Id, 
+                r.Name, 
+                r.Claims.Select(c => new UserClaimModel(c.ClaimType, c.ClaimValue)).ToList()
+            )).ToList()
         );
     }
     

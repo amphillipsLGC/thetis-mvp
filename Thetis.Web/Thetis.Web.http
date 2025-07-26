@@ -1,5 +1,5 @@
 @Thetis_HostAddress = http://localhost:5032
-@AuthCookie = thetis_cookie=CfDJ8P60pvhiA3ZEk1bbt2LaC0BPGnY9x5qQwd-_qeO6aPZLPXDmt2y5vshFctfzX9CgI3blh6NH7KlXXX5eui_9X2v3ZFujkwmPVZZnWSgK3CG-gRD4d0PLQSqGAQ24i5Xm0X690K_2kZM6s0QNwaWODoF9pXMUGZiDvQoXuIPgqil3Ifg2-5cxh9m50N57gwuTLrL-XAzIi7ny6CV1aSoSwUJFuqjVpA_69A4uA635dEqd9wOq6IwOyWbBjLlwRh5RlTglgHStkSQPl2O5IcyZOYTUPidZ3Hy-5QxaI7r8J7dxY-yZ0nK3nwtuT0eK1vNd6V5k8FnyPIFwxfsK_Z7RnsFwZoGVmsDUtai3ZfV--4r4Y5Tu4Szg968D_i7DZwXcC_boTW-voPsMu3oMjNWdE8Fwj4lWcorxWAxPtbMiwcChNAhhLLS1XFPt_6ZLC2rc_tbaq60hKXwaJMNXFzM3I8Y
+//@AuthCookie = thetis_cookie=CfDJ8P60pvhiA3ZEk1bbt2LaC0BPGnY9x5qQwd-_qeO6aPZLPXDmt2y5vshFctfzX9CgI3blh6NH7KlXXX5eui_9X2v3ZFujkwmPVZZnWSgK3CG-gRD4d0PLQSqGAQ24i5Xm0X690K_2kZM6s0QNwaWODoF9pXMUGZiDvQoXuIPgqil3Ifg2-5cxh9m50N57gwuTLrL-XAzIi7ny6CV1aSoSwUJFuqjVpA_69A4uA635dEqd9wOq6IwOyWbBjLlwRh5RlTglgHStkSQPl2O5IcyZOYTUPidZ3Hy-5QxaI7r8J7dxY-yZ0nK3nwtuT0eK1vNd6V5k8FnyPIFwxfsK_Z7RnsFwZoGVmsDUtai3ZfV--4r4Y5Tu4Szg968D_i7DZwXcC_boTW-voPsMu3oMjNWdE8Fwj4lWcorxWAxPtbMiwcChNAhhLLS1XFPt_6ZLC2rc_tbaq60hKXwaJMNXFzM3I8Y
 
 ### Add a new role
 POST {{Thetis_HostAddress}}/api/roles
@@ -120,7 +120,6 @@ Accept: application/json
 @UserPageSize = 10
 GET {{Thetis_HostAddress}}/api/users?pageNumber={{UserPageNumber}}&pageSize={{UserPageSize}}
 Accept: application/json
-Cookie: {{AuthCookie}}
 
 ### Get profile by ID
 

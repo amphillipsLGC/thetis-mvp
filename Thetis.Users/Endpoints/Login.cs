@@ -53,6 +53,14 @@ internal class Login(IUserService userService) : Endpoint<LoginRequest>
                 {
                     claims.AddRange(authenticatedUser.Roles.Select(role => new Claim(SystemClaims.Roles, role.Name)));
                     
+                    // Create a unique set of claims
+                    var uniqueClaims = authenticatedUser.Roles
+                        .SelectMany(role => role.Claims)
+                        .GroupBy(claim => claim.ClaimValue)
+                        .Select(g => g.First())
+                        .ToList();
+                    
+                    claims.AddRange(uniqueClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue)));
                 }
                 
                 var identity = new ClaimsIdentity(claims, ThetisAuthenticationSchemes.Cookie);

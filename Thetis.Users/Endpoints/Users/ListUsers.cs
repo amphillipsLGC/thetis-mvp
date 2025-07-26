@@ -25,7 +25,6 @@ internal class ListUsers(IUserService userService) : EndpointWithoutRequest<List
             .ProducesProblem(404)
             .ProducesProblem(500));
         Policies(nameof(PolicyNames.SystemAdministrator));
-        //AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken cancellationToken)

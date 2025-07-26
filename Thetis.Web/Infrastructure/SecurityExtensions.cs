@@ -63,6 +63,28 @@ public static class SecurityExtensions
                 
                 return Task.CompletedTask;
             };
+            
+            opts.Events.OnRedirectToLogin = context =>
+            {
+                if (context.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+                context.Response.Redirect(context.Request.Host + "/api/login");
+                return Task.CompletedTask;
+            };
+
+            opts.Events.OnRedirectToAccessDenied = context =>
+            {
+                if (context.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                }
+                context.Response.Redirect(context.Request.Host + "/api/login");
+                return Task.CompletedTask;
+            };
         });
         
         // Configure Challenge Schemas
@@ -95,6 +117,28 @@ public static class SecurityExtensions
                 
                     return Task.CompletedTask;
                 };
+                
+                opts.Events.OnAuthenticationFailed = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.Request.Host + "/api/login");
+                    return Task.CompletedTask;
+                };
+                
+                opts.Events.OnAccessDenied = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.Request.Host + "/api/login");
+                    return Task.CompletedTask;
+                };
             });
         }
         
@@ -115,6 +159,28 @@ public static class SecurityExtensions
                     NameClaimType = SystemClaims.Name,
                     RoleClaimType = SystemClaims.Roles,
                     ValidTypes = securityServiceOptions.ValidJwtTypes ?? ["at+jwt", "JWT"],
+                };
+                
+                opts.Events.OnAuthenticationFailed = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.Request.Host + "/api/login");
+                    return Task.CompletedTask;
+                };
+
+                opts.Events.OnForbidden = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.Request.Host + "/api/login");
+                    return Task.CompletedTask;
                 };
             });
         }
